@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barte Checkout Test</title>
+  </head>
+  <body></body>
+
+  <script src="sdk.js"></script>
+
+  <script>
+    const sdk = new BarteSDK({
+      apiKey: "my-api-key",
+      resultCallback: (data) => {
+        console.log(`Resultado do lado do sdk: ${JSON.stringify(data)}`);
+      },
+    });
+
+    sdk.tokenize({
+      cardHolderName: "Gabriel Silva Nascimento",
+      cardCVV: "124",
+      cardExpiryDate: "07/25",
+      cardNumber: "5400511326648160",
+    });
+  </script>
+</html>
