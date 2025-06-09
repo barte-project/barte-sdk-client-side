@@ -5,23 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Barte Checkout Test</title>
   </head>
-  <body></body>
+  <body>
+    <button onclick="callScript()">Tokenizar cartão</button>
+  </body>
 
-  <script src="sdk.js"></script>
+  <script src="sdk.min.js"></script>
 
   <script>
     const sdk = new BarteSDK({
-      apiKey: "my-api-key",
+      apiKey: "2f2e3964-e476-417f-8e90-27c38355ee77",
       resultCallback: (data) => {
         console.log(`Resultado do lado do sdk: ${JSON.stringify(data)}`);
       },
     });
 
-    sdk.tokenize({
-      cardHolderName: "Gabriel Silva Nascimento",
-      cardCVV: "124",
-      cardExpiryDate: "07/25",
-      cardNumber: "5400511326648160",
-    });
+    function callScript() {
+      try {
+        sdk.cardToken({
+          cardHolderName: "JOSE DAS NEVES TEST",
+          cardCVV: "220",
+          cardExpiryDate: "12/2025",
+          cardNumber: "5383638854440891",
+          buyerUuid: "751f9b5b-7185-465e-a8e4-b958d3b36006",
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   </script>
 </html>

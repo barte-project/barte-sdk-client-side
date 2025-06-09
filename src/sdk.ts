@@ -1,0 +1,167 @@
+type TokenizeResult = {
+  uuid: string;
+  status: string;
+  createdAt: string;
+  brand: string;
+  cardHolderName: string;
+  cvvChecked: boolean;
+  fingerprint: string;
+  first6digits: string;
+  last4digits: string;
+  buyerId: string;
+  expirationMonth: string;
+  expirationYear: string;
+  cardId: string;
+};
+
+type ResultCallbackType = (data: TokenizeResult) => void;
+
+type BarteSDKConstructorProps = {
+  apiKey: string;
+  resultCallback: ResultCallbackType;
+};
+
+type CardTokenData = {
+  cardHolderName: string;
+  cardCVV: string;
+  cardExpiryDate: string;
+  cardNumber: string;
+  buyerUuid: string;
+};
+
+export class BarteSDK {
+  private resultCallback: ResultCallbackType;
+  private apiKey: string;
+
+  constructor({ apiKey, resultCallback }: BarteSDKConstructorProps) {
+    if (!window)
+      throw new Error(
+        "Window is not defined, Barte SDK must be used in frontend context!"
+      );
+
+    if (!apiKey) throw new Error("API Key is required!");
+
+    if (!resultCallback) throw new Error("Result callback is required!");
+
+    this.resultCallback = resultCallback;
+    this.apiKey = apiKey;
+
+    this.createIframe();
+    this.setup();
+  }
+
+  public cardToken({
+    cardHolderName,
+    cardCVV,
+    cardExpiryDate,
+    cardNumber,
+    buyerUuid,
+  }: CardTokenData) {
+    if (cardNumber.length < 16) throw new Error("Invalid Card Number");
+
+    if (!this.luhnValidator(cardNumber))
+      throw new Error("Invalid Card Number Format");
+
+    if (!buyerUuid) throw new Error("Invalid Buyer Uuid");
+
+    if (!cardHolderName) throw new Error("Invalid Card Holder Name");
+
+    if (!this.dateValidator(cardExpiryDate))
+      throw new Error("Invalid date format");
+
+    if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
+      throw new Error("Invalid Card CVV");
+
+    const iframe = this.getIFrame();
+
+    if (!iframe) throw new Error("IFrame not mounted");
+
+    iframe.contentWindow?.postMessage(
+      {
+        type: "submitForm",
+        data: {
+          holderName: cardHolderName.trim(),
+          cvv: cardCVV,
+          expiration: cardExpiryDate,
+          number: cardNumber,
+          buyerUuid,
+        },
+      },
+      "*"
+    );
+  }
+
+  private getIFrame() {
+    return document.getElementById(
+      "barte-checkout-iframe"
+    ) as HTMLIFrameElement;
+  }
+
+  private createIframe() {
+    const iframeAlreadyExists = this.getIFrame();
+
+    if (iframeAlreadyExists) {
+      return;
+    }
+
+    const iframe = document.createElement("iframe");
+    iframe.src = "http://localhost:3000/index.html"; // replace by iframe final url
+    iframe.id = "barte-checkout-iframe";
+    iframe.style = "display: none";
+
+    iframe.addEventListener("load", () => {
+      iframe.contentWindow?.postMessage(
+        { type: "apiKey", apiKey: this.apiKey },
+        "*"
+      );
+    });
+
+    const ROOT_ELEMENT = "body";
+
+    const rootElement = document.querySelector(ROOT_ELEMENT);
+
+    if (!rootElement) throw new Error(`Element ${ROOT_ELEMENT} not found!`);
+
+    rootElement.appendChild(iframe);
+  }
+
+  private setup() {
+    window.addEventListener("message", (message) =>
+      this.resultCallback(message.data)
+    );
+  }
+
+  private dateValidator(value: string) {
+    const expirationDateRegex = /^(0[1-9]|1[0-2])\/(\d{4})$/;
+
+    if (!expirationDateRegex.test(value)) return false;
+
+    if (Number(value.substring(3, 7)) < new Date().getFullYear()) return false;
+
+    if (Number(value.substring(0, 2)) < new Date().getMonth() + 1) return false;
+
+    return true;
+  }
+
+  private luhnValidator(number: string) {
+    const cleanNumber = number.replace(/\D/g, "");
+    let sum = 0;
+    let shouldDouble = false;
+
+    for (let i = cleanNumber.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleanNumber[i]);
+
+      if (shouldDouble) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+
+      sum += digit;
+      shouldDouble = !shouldDouble;
+    }
+
+    return sum % 10 === 0;
+  }
+}
+
+(window as any).BarteSDK = BarteSDK;
