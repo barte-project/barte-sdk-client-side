@@ -1,30 +1,8 @@
-type TokenizeResult = {
-  uuid: string;
-  status: string;
-  createdAt: string;
-  brand: string;
-  cardHolderName: string;
-  cvvChecked: boolean;
-  fingerprint: string;
-  first6digits: string;
-  last4digits: string;
-  buyerId: string;
-  expirationMonth: string;
-  expirationYear: string;
-  cardId: string;
-};
-
-type BarteSDKConstructorProps = {
-  apiKey: string;
-};
-
-type CardTokenData = {
-  cardHolderName: string;
-  cardCVV: string;
-  cardExpiryDate: string;
-  cardNumber: string;
-  buyerUuid: string;
-};
+import type {
+  BarteSDKConstructorProps,
+  CardTokenData,
+  TokenizeResult,
+} from "./types";
 
 export class BarteSDK {
   private apiKey: string;
