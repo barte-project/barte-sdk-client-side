@@ -14,20 +14,19 @@
   <script>
     const sdk = new BarteSDK({
       apiKey: "2f2e3964-e476-417f-8e90-27c38355ee77",
-      resultCallback: (data) => {
-        console.log(`Resultado do lado do sdk: ${JSON.stringify(data)}`);
-      },
     });
 
-    function callScript() {
+    async function callScript() {
       try {
-        sdk.cardToken({
+        const result = await sdk.cardToken({
           cardHolderName: "JOSE DAS NEVES TEST",
           cardCVV: "220",
           cardExpiryDate: "12/2025",
           cardNumber: "5383638854440891",
           buyerUuid: "751f9b5b-7185-465e-a8e4-b958d3b36006",
         });
+
+        console.log(result);
       } catch (error) {
         console.log(error);
       }

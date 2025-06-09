@@ -56,5 +56,3 @@ const htmlDestIndex = path.resolve(__dirname, "dist", "index.html");
 
 fs.copyFileSync(htmlSourceIndex, htmlDestIndex);
 console.log("✔ index.html copiado para dist/");
-
-

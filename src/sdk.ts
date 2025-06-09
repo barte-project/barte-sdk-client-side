@@ -14,11 +14,8 @@ type TokenizeResult = {
   cardId: string;
 };
 
-type ResultCallbackType = (data: TokenizeResult) => void;
-
 type BarteSDKConstructorProps = {
   apiKey: string;
-  resultCallback: ResultCallbackType;
 };
 
 type CardTokenData = {
@@ -30,10 +27,9 @@ type CardTokenData = {
 };
 
 export class BarteSDK {
-  private resultCallback: ResultCallbackType;
   private apiKey: string;
 
-  constructor({ apiKey, resultCallback }: BarteSDKConstructorProps) {
+  constructor({ apiKey }: BarteSDKConstructorProps) {
     if (!window)
       throw new Error(
         "Window is not defined, Barte SDK must be used in frontend context!"
@@ -41,13 +37,9 @@ export class BarteSDK {
 
     if (!apiKey) throw new Error("API Key is required!");
 
-    if (!resultCallback) throw new Error("Result callback is required!");
-
-    this.resultCallback = resultCallback;
     this.apiKey = apiKey;
 
     this.createIframe();
-    this.setup();
   }
 
   public cardToken({
@@ -56,7 +48,7 @@ export class BarteSDK {
     cardExpiryDate,
     cardNumber,
     buyerUuid,
-  }: CardTokenData) {
+  }: CardTokenData): Promise<TokenizeResult> {
     if (cardNumber.length < 16) throw new Error("Invalid Card Number");
 
     if (!this.luhnValidator(cardNumber))
@@ -75,20 +67,35 @@ export class BarteSDK {
     const iframe = this.getIFrame();
 
     if (!iframe) throw new Error("IFrame not mounted");
+    return new Promise((resolve, reject) => {
+      const listener = (message: MessageEvent<any>) => {
+        window.removeEventListener("message", listener);
 
-    iframe.contentWindow?.postMessage(
-      {
-        type: "submitForm",
-        data: {
-          holderName: cardHolderName.trim(),
-          cvv: cardCVV,
-          expiration: cardExpiryDate,
-          number: cardNumber,
-          buyerUuid,
+        const messageData = message.data;
+
+        // TODO: Mapear outros cenários de erros possíveis aqui
+        if (Array.isArray(messageData.errors) && messageData.errors.length)
+          reject(messageData);
+
+        resolve(messageData);
+      };
+
+      window.addEventListener("message", listener);
+
+      iframe.contentWindow?.postMessage(
+        {
+          type: "submitForm",
+          data: {
+            holderName: cardHolderName.trim(),
+            cvv: cardCVV,
+            expiration: cardExpiryDate,
+            number: cardNumber,
+            buyerUuid,
+          },
         },
-      },
-      "*"
-    );
+        "*"
+      );
+    });
   }
 
   private getIFrame() {
@@ -123,12 +130,6 @@ export class BarteSDK {
     if (!rootElement) throw new Error(`Element ${ROOT_ELEMENT} not found!`);
 
     rootElement.appendChild(iframe);
-  }
-
-  private setup() {
-    window.addEventListener("message", (message) =>
-      this.resultCallback(message.data)
-    );
   }
 
   private dateValidator(value: string) {

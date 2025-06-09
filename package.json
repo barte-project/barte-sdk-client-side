@@ -11,7 +11,7 @@
   "license": "ISC",
   "scripts": {
     "build": "node build.js",
-    "dev": "serve dist"
+    "dev": "node build.js && serve dist"
   },
   "devDependencies": {
     "esbuild": "^0.25.5",
