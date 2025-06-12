@@ -2,3 +2,8 @@ src
 node_modules
 dist/*.html
 build.js
+pipeline/
+tests/
+docs/
+.gitignore
+*.md
