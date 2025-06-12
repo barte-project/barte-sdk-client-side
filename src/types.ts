@@ -15,7 +15,7 @@ export type TokenizeResult = {
 };
 
 export type BarteSDKConstructorProps = {
-  apiKey: string;
+  publicKey: string;
 };
 
 export type CardTokenData = {

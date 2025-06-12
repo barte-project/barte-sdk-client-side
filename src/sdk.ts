@@ -5,17 +5,17 @@ import type {
 } from "./types";
 
 export class BarteSDK {
-  private apiKey: string;
+  private publicKey: string;
 
-  constructor({ apiKey }: BarteSDKConstructorProps) {
+  constructor({ publicKey }: BarteSDKConstructorProps) {
     if (!window)
       throw new Error(
         "Window is not defined, Barte SDK must be used in frontend context!"
       );
 
-    if (!apiKey) throw new Error("API Key is required!");
+    if (!publicKey) throw new Error("API Key is required!");
 
-    this.apiKey = apiKey;
+    this.publicKey = publicKey;
 
     this.createIframe();
   }
@@ -69,6 +69,7 @@ export class BarteSDK {
             expiration: cardExpiryDate,
             number: cardNumber,
             buyerUuid,
+            publicKey: this.publicKey,
           },
         },
         "*"
@@ -93,13 +94,6 @@ export class BarteSDK {
     iframe.src = "http://localhost:3000/index.html"; // replace by iframe final url
     iframe.id = "barte-checkout-iframe";
     iframe.style = "display: none";
-
-    iframe.addEventListener("load", () => {
-      iframe.contentWindow?.postMessage(
-        { type: "apiKey", apiKey: this.apiKey },
-        "*"
-      );
-    });
 
     const ROOT_ELEMENT = "body";
 
