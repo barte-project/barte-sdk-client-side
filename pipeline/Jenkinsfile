@@ -4,6 +4,7 @@ pipeline {
         AWS_ACCOUNT = 'pci-account'
         S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
         AWS_CONFIG_PATH = '/tmp/aws/config'
+        AWS_SHARED_CREDENTIALS_FILE = '/tmp/aws/credentials'
     }
     stages {
         stage('Build') {
@@ -31,12 +32,13 @@ pipeline {
 region = us-east-1
 role_arn = arn:aws:iam::581307502157:role/jenkins-pci
 credential_source = Ec2InstanceMetadata" > ${AWS_CONFIG_PATH}
-                    
+
                     export AWS_CONFIG_FILE=${AWS_CONFIG_PATH}
-                    
+                    export AWS_SHARED_CREDENTIALS_FILE=${AWS_CONFIG_PATH}
+
                     echo "Cleaning up S3 bucket..."
                     aws s3 rm s3://${S3_BUCKET} --recursive --profile ${AWS_ACCOUNT}
-                    
+
                     echo "Uploading files to S3 bucket..."
                     aws s3 cp dist/index.html s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
                     aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
