@@ -11,8 +11,7 @@ pipeline {
       agent {
         docker {
           image 'node:20-alpine'
-          // Não precisa montar o volume manualmente, Jenkins já faz isso automaticamente
-          args '-w $WORKSPACE'  // opcional, só pra garantir que o diretório corrente seja o workspace
+          args '-v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
         }
       }
       steps {
@@ -26,8 +25,8 @@ pipeline {
       agent {
         docker {
           image 'amazon/aws-cli:2.12.5'
-          // Mesma coisa aqui, sem montar volume manualmente
-          args '-w $WORKSPACE --entrypoint=""'
+          // monta o workspace explicitamente para garantir acesso ao dist/
+          args "-v ${env.WORKSPACE}:${env.WORKSPACE} -w ${env.WORKSPACE} --entrypoint=\"\""
         }
       }
       steps {
