@@ -3,51 +3,37 @@ pipeline {
 
   environment {
     S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
-    AWS_ROLE_ARN = 'arn:aws:iam::581307502157:role/jenkins-pci'
     AWS_REGION = 'us-east-1'
-    PROFILE_NAME = 'pci-account'
+    HOME = '/tmp'  // evitar erros de permissão
   }
 
   stages {
     stage('Build') {
       agent {
-        docker { image 'node:18-alpine' }
+        docker { image 'node:20-alpine' }
       }
       steps {
-        sh '''
-          echo "Running build..."
-          npm install
-          npm run build
-        '''
+        sh 'npm install'
+        sh 'npm run build'
       }
     }
 
     stage('Deploy to S3') {
       agent {
-        docker { image 'amazon/aws-cli:2.12.5' }
+        docker { image 'amazon/aws-cli:2.12.5' args '--entrypoint=""' }
       }
       steps {
-        sh '''
-          mkdir -p /tmp/aws
+        withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS_PCI', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+          sh '''
+            echo "Cleaning up S3 bucket..."
+            aws s3 rm s3://${S3_BUCKET} --recursive --region ${AWS_REGION}
 
-          cat > /tmp/aws/config <<EOF
-          [profile ${PROFILE_NAME}]
-          region = ${AWS_REGION}
-          role_arn = ${AWS_ROLE_ARN}
-          credential_source = Ec2InstanceMetadata
-          EOF
-
-          export AWS_CONFIG_FILE=/tmp/aws/config
-          export HOME=/tmp
-
-          echo "Cleaning up S3 bucket..."
-          aws s3 rm s3://${S3_BUCKET} --recursive --profile ${PROFILE_NAME}
-
-          echo "Uploading files to S3 bucket..."
-          aws s3 cp dist/index.html s3://${S3_BUCKET}/ --profile ${PROFILE_NAME}
-          aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --profile ${PROFILE_NAME}
-          aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --profile ${PROFILE_NAME}
-        '''
+            echo "Uploading files to S3 bucket..."
+            aws s3 cp dist/index.html s3://${S3_BUCKET}/ --region ${AWS_REGION}
+            aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --region ${AWS_REGION}
+            aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --region ${AWS_REGION}
+          '''
+        }
       }
     }
   }
