@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'node:20-alpine'
+      args '-w $WORKSPACE'
+    }
+  }
 
   environment {
     S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
@@ -8,13 +13,6 @@ pipeline {
 
   stages {
     stage('Build') {
-      agent {
-        docker {
-          image 'node:20-alpine'
-          // remove o -v, o Jenkins já monta o workspace
-          args '-w $WORKSPACE'
-        }
-      }
       steps {
         sh 'npm install'
         sh 'npm run build'
@@ -23,21 +21,17 @@ pipeline {
     }
 
     stage('Deploy to S3') {
-      agent {
-        docker {
-          image 'amazon/aws-cli:2.12.5'
-          // remove o -v, mantém só o -w para trabalhar no workspace
-          args '-w $WORKSPACE --entrypoint=""'
-        }
-      }
       steps {
         withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS_PCI', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+          // instala o AWS CLI no container node:20-alpine e faz deploy
           sh '''
-            ls -l dist
-            echo "Cleaning up S3 bucket..."
+            apk add --no-cache python3 py3-pip
+            pip3 install --upgrade awscli
+
+            aws --version
+
             aws s3 rm s3://${S3_BUCKET} --recursive --region ${AWS_REGION}
 
-            echo "Uploading files to S3 bucket..."
             aws s3 cp dist/index.html s3://${S3_BUCKET}/ --region ${AWS_REGION}
             aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --region ${AWS_REGION}
             aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --region ${AWS_REGION}
