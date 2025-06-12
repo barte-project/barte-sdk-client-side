@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'node:20-alpine'
+      image '435636472520.dkr.ecr.us-east-1.amazonaws.com/ecr-barte-baseimage-flex-builder:1.0.36'
       args '--user=root -w $WORKSPACE'
     }
   }
@@ -23,11 +23,8 @@ pipeline {
     stage('Deploy to S3') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS_PCI', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-          // instala o AWS CLI no container node:20-alpine e faz deploy
+          // Usa a imagem personalizada para fazer deploy
           sh '''
-            apk add --no-cache python3 py3-pip
-            pip3 install --upgrade awscli
-
             aws --version
 
             aws s3 rm s3://${S3_BUCKET} --recursive --region ${AWS_REGION}
