@@ -6,10 +6,10 @@ pipeline {
     }
   }
 
-  environment {
-    S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
-    AWS_REGION = 'us-east-1'
-  }
+// environment {
+//    S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
+//   AWS_REGION = 'us-east-1'
+// }
 
   stages {
     stage('Build') {
@@ -32,6 +32,7 @@ pipeline {
             aws s3 cp dist/index.html s3://${S3_BUCKET}/ --region ${AWS_REGION}
             aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --region ${AWS_REGION}
             aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --region ${AWS_REGION}
+            aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths '/*'
           '''
         }
       }
