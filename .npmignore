@@ -1,4 +1,5 @@
 src
 node_modules
-dist/*.html
 build.js
+dist/*.html
+dist/*.min.js
