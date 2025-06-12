@@ -1,12 +1,6 @@
 pipeline {
     agent any
-
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
         stage('Build') {
             agent {
                 docker {
@@ -16,10 +10,49 @@ pipeline {
             steps {
                 sh 'npm install'
                 sh 'npm run build'
-                sh 'ls -l'
-                sh 'ls dist'
             }
         }
-
+        stage('Prepare AWS CLI') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli:2.12.5'
+                }
+            }
+            steps {
+                sh '''
+                    mkdir -p ~/.aws
+                    echo "[profile ${AWS_ACCOUNT}]
+region = us-east-1
+role_arn = arn:aws:iam::581307502157:role/jenkins-pci
+credential_source = Ec2InstanceMetadata" > ~/.aws/config
+                '''
+            }
+        }
+        stage('Clean S3 Bucket') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli:2.12.5'
+                }
+            }
+            steps {
+                sh '''
+                    aws s3 rm s3://${S3_BUCKET} --recursive --profile ${AWS_ACCOUNT}
+                '''
+            }
+        }
+        stage('Upload to S3') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli:2.12.5'
+                }
+            }
+            steps {
+                sh '''
+                    aws s3 cp dist/index.html s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
+                    aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
+                    aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
+                '''
+            }
+        }
     }
 }
