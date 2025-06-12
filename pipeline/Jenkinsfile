@@ -11,13 +11,14 @@ pipeline {
       agent {
         docker {
           image 'node:20-alpine'
-          args '-v $WORKSPACE:$WORKSPACE -w $WORKSPACE'
+          // remove o -v, o Jenkins já monta o workspace
+          args '-w $WORKSPACE'
         }
       }
       steps {
         sh 'npm install'
         sh 'npm run build'
-        sh 'ls -l dist'  // para garantir que dist foi criado
+        sh 'ls -l dist'
       }
     }
 
@@ -25,8 +26,8 @@ pipeline {
       agent {
         docker {
           image 'amazon/aws-cli:2.12.5'
-          // monta o workspace explicitamente para garantir acesso ao dist/
-          args "-v ${env.WORKSPACE}:${env.WORKSPACE} -w ${env.WORKSPACE} --entrypoint=\"\""
+          // remove o -v, mantém só o -w para trabalhar no workspace
+          args '-w $WORKSPACE --entrypoint=""'
         }
       }
       steps {
