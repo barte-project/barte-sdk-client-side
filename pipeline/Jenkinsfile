@@ -23,7 +23,7 @@ pipeline {
         docker { image 'amazon/aws-cli:2.12.5' args '--entrypoint=""' }
       }
       steps {
-        withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS_PCI', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
           sh '''
             echo "Cleaning up S3 bucket..."
             aws s3 rm s3://${S3_BUCKET} --recursive --region ${AWS_REGION}
