@@ -16,15 +16,17 @@ pipeline {
             agent {
                 docker {
                     image 'amazon/aws-cli:2.12.5'
+                    args '--user root' // Adiciona permissões de root
                 }
             }
             steps {
                 sh '''
-                    mkdir -p ~/.aws
+                    mkdir -p /tmp/aws
                     echo "[profile ${AWS_ACCOUNT}]
 region = us-east-1
 role_arn = arn:aws:iam::581307502157:role/jenkins-pci
-credential_source = Ec2InstanceMetadata" > ~/.aws/config
+credential_source = Ec2InstanceMetadata" > /tmp/aws/config
+                    export AWS_CONFIG_FILE=/tmp/aws/config
                 '''
             }
         }
@@ -32,10 +34,12 @@ credential_source = Ec2InstanceMetadata" > ~/.aws/config
             agent {
                 docker {
                     image 'amazon/aws-cli:2.12.5'
+                    args '--user root'
                 }
             }
             steps {
                 sh '''
+                    export AWS_CONFIG_FILE=/tmp/aws/config
                     aws s3 rm s3://${S3_BUCKET} --recursive --profile ${AWS_ACCOUNT}
                 '''
             }
@@ -44,10 +48,12 @@ credential_source = Ec2InstanceMetadata" > ~/.aws/config
             agent {
                 docker {
                     image 'amazon/aws-cli:2.12.5'
+                    args '--user root'
                 }
             }
             steps {
                 sh '''
+                    export AWS_CONFIG_FILE=/tmp/aws/config
                     aws s3 cp dist/index.html s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
                     aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
                     aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
