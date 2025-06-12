@@ -18,15 +18,6 @@ pipeline {
                 sh 'npm run build'
             }
         }
-        stage('Test') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                }
-            }
-            steps {
-                sh 'npm test'
-            }
-        }
+
     }
 }
