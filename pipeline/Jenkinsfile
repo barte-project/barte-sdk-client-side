@@ -3,6 +3,7 @@ pipeline {
     environment {
         AWS_ACCOUNT = 'pci-account'
         S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
+        AWS_CONFIG_PATH = '/tmp/aws/config'
     }
     stages {
         stage('Build') {
@@ -20,7 +21,7 @@ pipeline {
             agent {
                 docker {
                     image 'amazon/aws-cli:2.12.5'
-                    args '--user root --entrypoint=""' // Força execução sem ENTRYPOINT
+                    args '--user root --entrypoint=""'
                 }
             }
             steps {
@@ -29,8 +30,8 @@ pipeline {
                     echo "[profile ${AWS_ACCOUNT}]
 region = us-east-1
 role_arn = arn:aws:iam::581307502157:role/jenkins-pci
-credential_source = Ec2InstanceMetadata" > /tmp/aws/config
-                    export AWS_CONFIG_FILE=/tmp/aws/config
+credential_source = Ec2InstanceMetadata" > ${AWS_CONFIG_PATH}
+                    cat ${AWS_CONFIG_PATH}
                 '''
             }
         }
@@ -43,7 +44,8 @@ credential_source = Ec2InstanceMetadata" > /tmp/aws/config
             }
             steps {
                 sh '''
-                    export AWS_CONFIG_FILE=/tmp/aws/config
+                    export AWS_CONFIG_FILE=${AWS_CONFIG_PATH}
+                    aws configure list-profiles
                     aws s3 rm s3://${S3_BUCKET} --recursive --profile ${AWS_ACCOUNT}
                 '''
             }
@@ -57,7 +59,7 @@ credential_source = Ec2InstanceMetadata" > /tmp/aws/config
             }
             steps {
                 sh '''
-                    export AWS_CONFIG_FILE=/tmp/aws/config
+                    export AWS_CONFIG_FILE=${AWS_CONFIG_PATH}
                     aws s3 cp dist/index.html s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
                     aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
                     aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
