@@ -4,13 +4,15 @@ pipeline {
   environment {
     S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
     AWS_REGION = 'us-east-1'
-    HOME = '/tmp'  // evitar erros de permissão
+    HOME = '/tmp'  // evitar erro de permissão
   }
 
   stages {
     stage('Build') {
       agent {
-        docker { image 'node:20-alpine' }
+        docker {
+          image 'node:20-alpine'
+        }
       }
       steps {
         sh 'npm install'
@@ -20,7 +22,10 @@ pipeline {
 
     stage('Deploy to S3') {
       agent {
-        docker { image 'amazon/aws-cli:2.12.5' args '--entrypoint=""' }
+        docker {
+          image 'amazon/aws-cli:2.12.5'
+          args '--entrypoint=""'
+        }
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'AWS_CREDENTIALS', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
