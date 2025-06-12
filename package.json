@@ -1,16 +1,18 @@
 {
-  "name": "bartesdk",
-  "version": "2.0.0",
-  "description": "SDK para interação com a API da Barte.",
+  "name": "@barte-brasil/barte-sdk-web",
+  "version": "1.0.0",
+  "author": {
+    "name": "Gabriel Silva",
+    "email": "gabriel.silva@barte.com"
+  },
   "main": "dist/sdk.cjs.js",
   "module": "dist/sdk.esm.js",
   "types": "dist/types/sdk.d.ts",
+  "license": "ISC",
   "scripts": {
     "build": "node build.js",
     "dev": "node build.js && serve dist"
   },
-  "author": "Engenharia de Plataforma da Barte",
-  "license": "ISC",
   "devDependencies": {
     "esbuild": "^0.25.5",
     "serve": "^14.2.4",
