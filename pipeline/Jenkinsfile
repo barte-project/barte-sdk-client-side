@@ -1,50 +1,54 @@
 pipeline {
-    agent any
-    environment {
-        AWS_ACCOUNT = 'pci-account'
-        S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
-        AWS_CONFIG_PATH = '/tmp/aws/config'
-        AWS_SHARED_CREDENTIALS_FILE = '/tmp/aws/credentials'
+  agent any
+
+  environment {
+    S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
+    AWS_ROLE_ARN = 'arn:aws:iam::581307502157:role/jenkins-pci'
+    AWS_REGION = 'us-east-1'
+    PROFILE_NAME = 'pci-account'
+  }
+
+  stages {
+    stage('Build') {
+      agent {
+        docker { image 'node:18-alpine' }
+      }
+      steps {
+        sh '''
+          echo "Running build..."
+          npm install
+          npm run build
+        '''
+      }
     }
-    stages {
-        stage('Build') {
-            agent {
-                docker {
-                    image 'node:20-alpine'
-                }
-            }
-            steps {
-                sh 'npm install'
-                sh 'npm run build'
-            }
-        }
-        stage('Upload to S3') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli:2.12.5'
-                    args '--entrypoint=""'
-                }
-            }
-            steps {
-                sh '''
-                    mkdir -p /tmp/aws
-                    echo "[profile ${AWS_ACCOUNT}]
-region = us-east-1
-role_arn = arn:aws:iam::581307502157:role/jenkins-pci
-credential_source = Ec2InstanceMetadata" > ${AWS_CONFIG_PATH}
 
-                    export AWS_CONFIG_FILE=${AWS_CONFIG_PATH}
-                    export AWS_SHARED_CREDENTIALS_FILE=${AWS_CONFIG_PATH}
+    stage('Deploy to S3') {
+      agent {
+        docker { image 'amazon/aws-cli:2.12.5' }
+      }
+      steps {
+        sh '''
+          mkdir -p /tmp/aws
 
-                    echo "Cleaning up S3 bucket..."
-                    aws s3 rm s3://${S3_BUCKET} --recursive --profile ${AWS_ACCOUNT}
+          cat > /tmp/aws/config <<EOF
+          [profile ${PROFILE_NAME}]
+          region = ${AWS_REGION}
+          role_arn = ${AWS_ROLE_ARN}
+          credential_source = Ec2InstanceMetadata
+          EOF
 
-                    echo "Uploading files to S3 bucket..."
-                    aws s3 cp dist/index.html s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
-                    aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
-                    aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --profile ${AWS_ACCOUNT}
-                '''
-            }
-        }
+          export AWS_CONFIG_FILE=/tmp/aws/config
+          export HOME=/tmp
+
+          echo "Cleaning up S3 bucket..."
+          aws s3 rm s3://${S3_BUCKET} --recursive --profile ${PROFILE_NAME}
+
+          echo "Uploading files to S3 bucket..."
+          aws s3 cp dist/index.html s3://${S3_BUCKET}/ --profile ${PROFILE_NAME}
+          aws s3 cp dist/script.min.js s3://${S3_BUCKET}/ --profile ${PROFILE_NAME}
+          aws s3 cp dist/sdk.min.js s3://${S3_BUCKET}/ --profile ${PROFILE_NAME}
+        '''
+      }
     }
+  }
 }
