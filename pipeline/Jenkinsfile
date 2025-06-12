@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        AWS_ACCOUNT = 'pci-account'
+        S3_BUCKET = 'pcip-sdk-node.pcip.barte.com'
+    }
     stages {
         stage('Build') {
             agent {
@@ -16,7 +20,7 @@ pipeline {
             agent {
                 docker {
                     image 'amazon/aws-cli:2.12.5'
-                    args '--user root' // Adiciona permissões de root
+                    args '--user root --entrypoint=""' // Força execução sem ENTRYPOINT
                 }
             }
             steps {
@@ -34,7 +38,7 @@ credential_source = Ec2InstanceMetadata" > /tmp/aws/config
             agent {
                 docker {
                     image 'amazon/aws-cli:2.12.5'
-                    args '--user root'
+                    args '--user root --entrypoint=""'
                 }
             }
             steps {
@@ -48,7 +52,7 @@ credential_source = Ec2InstanceMetadata" > /tmp/aws/config
             agent {
                 docker {
                     image 'amazon/aws-cli:2.12.5'
-                    args '--user root'
+                    args '--user root --entrypoint=""'
                 }
             }
             steps {
