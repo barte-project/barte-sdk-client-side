@@ -91,7 +91,7 @@ export class BarteSDK {
     }
 
     const iframe = document.createElement("iframe");
-    iframe.src = "https://dev-sdk-node.barte.com"; // replace by iframe final url
+    iframe.src = "https://dev-sdk-client.barte.com";
     iframe.id = "barte-checkout-iframe";
     iframe.style = "display: none";
 
