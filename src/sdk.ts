@@ -6,6 +6,7 @@ import type {
 
 export class BarteSDK {
   private publicKey: string;
+  private iframeReady: Promise<HTMLIFrameElement>;
 
   constructor({ publicKey }: BarteSDKConstructorProps) {
     if (!window)
@@ -17,10 +18,10 @@ export class BarteSDK {
 
     this.publicKey = publicKey;
 
-    this.createIframe();
+    this.iframeReady = this.createIframe();
   }
 
-  public cardToken({
+  public async cardToken({
     cardHolderName,
     cardCVV,
     cardExpiryDate,
@@ -42,9 +43,8 @@ export class BarteSDK {
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Invalid Card CVV");
 
-    const iframe = this.getIFrame();
+    const iframe = await this.iframeReady;
 
-    if (!iframe) throw new Error("IFrame not mounted");
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
         window.removeEventListener("message", listener);
@@ -83,25 +83,36 @@ export class BarteSDK {
     ) as HTMLIFrameElement;
   }
 
-  private createIframe() {
-    const iframeAlreadyExists = this.getIFrame();
+  private createIframe(): Promise<HTMLIFrameElement> {
+    return new Promise((resolve, reject) => {
+      let iframe = this.getIFrame();
 
-    if (iframeAlreadyExists) {
-      return;
-    }
+      if (iframe && iframe.contentWindow) {
+        if (iframe.contentDocument?.readyState === "complete") {
+          return resolve(iframe);
+        }
 
-    const iframe = document.createElement("iframe");
-    iframe.src = "https://dev-sdk-client.barte.com";
-    iframe.id = "barte-checkout-iframe";
-    iframe.style = "display: none";
+        iframe.onload = () => resolve(iframe);
+        iframe.onerror = () => reject(new Error("Erro ao carregar iframe"));
+        return;
+      }
 
-    const ROOT_ELEMENT = "body";
+      iframe = document.createElement("iframe");
+      iframe.src = "https://dev-sdk-client.barte.com";
+      iframe.id = "barte-checkout-iframe";
+      iframe.style = "display: none";
 
-    const rootElement = document.querySelector(ROOT_ELEMENT);
+      iframe.onload = () => resolve(iframe);
+      iframe.onerror = () => reject(new Error("Erro ao carregar iframe"));
 
-    if (!rootElement) throw new Error(`Element ${ROOT_ELEMENT} not found!`);
+      const container = document.querySelector("body");
+      if (!container) {
+        reject(new Error("Elemento body não encontrado!"));
+        return;
+      }
 
-    rootElement.appendChild(iframe);
+      container.appendChild(iframe);
+    });
   }
 
   private dateValidator(value: string) {
