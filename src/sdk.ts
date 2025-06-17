@@ -72,7 +72,7 @@ export class BarteSDK {
             accessToken: this.accessToken,
           },
         },
-        "*"
+        "https://dev-sdk-client.barte.com/script.min.js"
       );
     });
   }

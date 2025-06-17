@@ -1,5 +1,5 @@
 window.addEventListener("DOMContentLoaded", () => {
-  const API_URL = "https://dev-bff.barte.com/service/payment/public/cards";
+  const API_URL = "https://dev-bff.barte.com/service/payment/v1/cards/sdk";
 
   async function httpRequest(data: any) {
     const bodyData = { ...data };
@@ -24,7 +24,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (eventData.type === "submitForm") {
       const result = await httpRequest(eventData.data);
-      window.parent.postMessage(result, "*");
+      window.parent.postMessage(result, "https://dev-sdk-client.barte.com/");
     }
   });
 });
