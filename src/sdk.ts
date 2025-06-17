@@ -14,7 +14,7 @@ export class BarteSDK {
         "Window is not defined, Barte SDK must be used in frontend context!"
       );
 
-    if (!accessToken) throw new Error("API Key is required!");
+    if (!accessToken) throw new Error("Access Token is required!");
 
     this.accessToken = accessToken;
 
