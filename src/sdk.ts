@@ -5,18 +5,18 @@ import type {
 } from "./types";
 
 export class BarteSDK {
-  private publicKey: string;
+  private accessToken: string;
   private iframeReady: Promise<HTMLIFrameElement>;
 
-  constructor({ publicKey }: BarteSDKConstructorProps) {
+  constructor({ accessToken }: BarteSDKConstructorProps) {
     if (!window)
       throw new Error(
         "Window is not defined, Barte SDK must be used in frontend context!"
       );
 
-    if (!publicKey) throw new Error("API Key is required!");
+    if (!accessToken) throw new Error("API Key is required!");
 
-    this.publicKey = publicKey;
+    this.accessToken = accessToken;
 
     this.iframeReady = this.createIframe();
   }
@@ -69,7 +69,7 @@ export class BarteSDK {
             expiration: cardExpiryDate,
             number: cardNumber,
             buyerUuid,
-            publicKey: this.publicKey,
+            accessToken: this.accessToken,
           },
         },
         "*"
