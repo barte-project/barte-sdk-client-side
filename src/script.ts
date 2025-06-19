@@ -1,5 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => {
-  const API_URL = "https://dev-bff.barte.com/service/payment/v1/cards/sdk";
+  const API_URL =
+    "https://dev-bff.barte.com/service/payment/v1/sdk/card-tokens";
 
   async function httpRequest(data: any) {
     const bodyData = { ...data };
@@ -9,7 +10,7 @@ window.addEventListener("DOMContentLoaded", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${data.accessToken}`,
+        "X-Token-Sdk": data.accessToken,
       },
       body: JSON.stringify(bodyData),
     });
