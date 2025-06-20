@@ -72,7 +72,7 @@ export class BarteSDK {
             accessToken: this.accessToken,
           },
         },
-        "https://dev-sdk-client.barte.com/script.min.js"
+        "https://sandbox-sdk-client.barte.com/script.min.js"
       );
     });
   }
@@ -98,7 +98,7 @@ export class BarteSDK {
       }
 
       iframe = document.createElement("iframe");
-      iframe.src = "https://dev-sdk-client.barte.com";
+      iframe.src = "https://sandbox-sdk-client.barte.com";
       iframe.id = "barte-checkout-iframe";
       iframe.style = "display: none";
 

@@ -1,6 +1,5 @@
 window.addEventListener("DOMContentLoaded", () => {
-  const API_URL =
-    "https://dev-bff.barte.com/service/payment/v1/sdk/card-tokens";
+  const API_URL = "https://sandbox-api.barte.com/v2/sdk/card-tokens";
 
   async function httpRequest(data: any) {
     const bodyData = { ...data };
@@ -25,7 +24,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (eventData.type === "submitForm") {
       const result = await httpRequest(eventData.data);
-      window.parent.postMessage(result, "https://dev-sdk-client.barte.com/");
+      window.parent.postMessage(
+        result,
+        "https://sandbox-sdk-client.barte.com/"
+      );
     }
   });
 });
