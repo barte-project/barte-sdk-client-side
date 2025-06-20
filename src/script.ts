@@ -1,5 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => {
-  const API_URL = "https://sandbox-api.barte.com/v2/sdk/card-tokens";
+  const API_URL =
+    "https://sandbox-bff.barte.com/service/payment/v1/sdk/card-tokens";
 
   async function httpRequest(data: any) {
     const bodyData = { ...data };
