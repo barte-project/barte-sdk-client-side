@@ -6,7 +6,6 @@ import type {
 
 export class BarteSDK {
   private accessToken: string;
-  private iframeReady: Promise<HTMLIFrameElement>;
 
   constructor({ accessToken }: BarteSDKConstructorProps) {
     if (!window)
@@ -18,7 +17,7 @@ export class BarteSDK {
 
     this.accessToken = accessToken;
 
-    this.iframeReady = this.createIframe();
+    // this.iframeReady = this.createIframe();
   }
 
   public async cardToken({
@@ -43,19 +42,23 @@ export class BarteSDK {
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Invalid Card CVV");
 
-    const iframe = await this.iframeReady;
+    const iframe = await this.createIframe();
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
         window.removeEventListener("message", listener);
 
-        const messageData = message.data;
+        if (!message.data.error) {
+          const messageData = message.data;
 
-        // TODO: Mapear outros cenários de erros possíveis aqui
-        if (Array.isArray(messageData.errors) && messageData.errors.length)
-          reject(messageData);
+          // TODO: Mapear outros cenários de erros possíveis aqui
+          if (Array.isArray(messageData.errors) && messageData.errors.length)
+            reject(messageData);
 
-        resolve(messageData);
+          resolve(messageData);
+        }
+        reject(message.data);
+        this.getIFrame().remove();
       };
 
       window.addEventListener("message", listener);
@@ -85,24 +88,13 @@ export class BarteSDK {
 
   private createIframe(): Promise<HTMLIFrameElement> {
     return new Promise((resolve, reject) => {
-      let iframe = this.getIFrame();
-
-      if (iframe && iframe.contentWindow) {
-        if (iframe.contentDocument?.readyState === "complete") {
-          return resolve(iframe);
-        }
-
-        iframe.onload = () => resolve(iframe);
-        iframe.onerror = () => reject(new Error("Erro ao carregar iframe"));
-        return;
-      }
-
-      iframe = document.createElement("iframe");
+      const iframe = document.createElement("iframe");
       iframe.src = "https://sandbox-sdk-client.barte.com";
       iframe.id = "barte-checkout-iframe";
       iframe.style = "display: none";
 
       iframe.onload = () => resolve(iframe);
+
       iframe.onerror = () => reject(new Error("Erro ao carregar iframe"));
 
       const container = document.querySelector("body");

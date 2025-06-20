@@ -6,18 +6,28 @@ window.addEventListener("DOMContentLoaded", () => {
     const bodyData = { ...data };
     delete bodyData.accessToken;
 
-    const requestResult = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Token-Sdk": data.accessToken,
-      },
-      body: JSON.stringify(bodyData),
-    });
+    try {
+      const requestResult = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Token-Sdk": data.accessToken,
+        },
+        body: JSON.stringify(bodyData),
+      });
 
-    const result = await requestResult.json();
+      const result = await requestResult.json();
 
-    return result;
+      return {
+        error: false,
+        data: result,
+      };
+    } catch (error) {
+      return {
+        error: true,
+        errorMessage: error,
+      };
+    }
   }
 
   window.addEventListener("message", async (ev) => {
