@@ -1,6 +1,6 @@
 {
   "name": "barte-sdk-node-web",
-  "version": "1.0.5",
+  "version": "app-version",
   "author": {
     "name": "Gabriel Silva",
     "email": "gabriel.silva@barte.com"
