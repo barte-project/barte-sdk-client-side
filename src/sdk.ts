@@ -1,3 +1,4 @@
+import { FingerPrint } from "./fingerprint";
 import type {
   BarteSDKConstructorProps,
   CardTokenData,
@@ -6,6 +7,7 @@ import type {
 
 export class BarteSDK {
   private accessToken: string;
+  private fingerPrint: FingerPrint;
 
   constructor({ accessToken }: BarteSDKConstructorProps) {
     if (!window)
@@ -17,7 +19,7 @@ export class BarteSDK {
 
     this.accessToken = accessToken;
 
-    // this.iframeReady = this.createIframe();
+    this.fingerPrint = new FingerPrint();
   }
 
   public async cardToken({
@@ -78,6 +80,10 @@ export class BarteSDK {
         "https://sdk-client.barte.com/script.min.js"
       );
     });
+  }
+
+  public async getFingerPrint() {
+    return this.fingerPrint.fingerPrint();
   }
 
   private getIFrame() {

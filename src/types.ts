@@ -14,6 +14,27 @@ export type TokenizeResult = {
   cardId: string;
 };
 
+export type FingerPrintResult = {
+  userAgent: string;
+  language: string;
+  colorDepth: number;
+  screenHeight: number;
+  screenWidth: number;
+  timeZoneOffset: string;
+
+  os: string;
+  ramCapacity: number;
+  model: string;
+  resolution: string;
+  browser: string;
+  version: string;
+
+  javaEnabled: boolean;
+  javaScriptEnabled: boolean;
+  // acceptHeader: string;
+  // ip: string;
+};
+
 export type BarteSDKConstructorProps = {
   accessToken: string;
 };
