@@ -31,8 +31,6 @@ export type FingerPrintResult = {
 
   javaEnabled: boolean;
   javaScriptEnabled: boolean;
-  // acceptHeader: string;
-  // ip: string;
 };
 
 export type BarteSDKConstructorProps = {
