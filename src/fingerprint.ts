@@ -21,7 +21,6 @@ export class FingerPrint {
     const resolution = `${width}x${height}`;
 
     let model = "";
-    let version = "";
 
     // @ts-ignore
     if (navigator.userAgentData) {
@@ -32,8 +31,10 @@ export class FingerPrint {
       ]);
 
       model = result.model;
-      version = result.platformVersion;
     }
+
+    const browser = this.getBrowserName();
+    const os = this.getDeviceName();
 
     return {
       userAgent: this.userAgent,
@@ -44,19 +45,22 @@ export class FingerPrint {
       screenWidth: width,
       screenHeight: height,
       model,
-      os: this.getDeviceName(),
+      os,
       timeZoneOffset: new Date().getTimezoneOffset().toString(),
-      browser: this.getBrowserName(),
-      version: this.getBrowserVersion(
-        this.getBrowserName(),
-        this.getDeviceName()
-      ),
+      browser,
+      version: this.getBrowserVersion({ browserName: browser, os }),
       javaEnabled: navigator.javaEnabled(),
       javaScriptEnabled: true,
     };
   }
 
-  private getBrowserVersion(browserName: string, os: string): string {
+  private getBrowserVersion({
+    browserName,
+    os,
+  }: {
+    browserName: string;
+    os: string;
+  }): string {
     function getBrowserName(): string {
       const formatedBrowserName = {
         Chrome: "CriOS",
@@ -75,9 +79,7 @@ export class FingerPrint {
     const regex = new RegExp(`${finalBrowserName}/([\\d.]+)`);
     const result = this.userAgent.match(regex);
 
-    if (result && result[1]) return result[1];
-
-    return "";
+    return result && result[1] ? result[1] : "";
   }
 
   private getBrowserName(): string {
