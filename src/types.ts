@@ -44,3 +44,15 @@ export type CardTokenData = {
   cardNumber: string;
   buyerUuid: string;
 };
+
+type AntifraudService = "NETHONE" | "OSCILAR" | "BARTE";
+
+export type AccessTokenPayload = {
+  sellerId: number;
+  antifraudService: AntifraudService;
+};
+
+export type HTMLHandlerProps =
+  | { antifraudService: "NETHONE" }
+  | { antifraudService: "OSCILAR"; buyerUuid: string }
+  | { antifraudService: "BARTE" };

@@ -1,25 +1,93 @@
 import { FingerPrint } from "./fingerprint";
+import { HTMLHandler } from "./html_handler";
 import type {
+  AccessTokenPayload,
   BarteSDKConstructorProps,
   CardTokenData,
   TokenizeResult,
 } from "./types";
 
+class SDKUtils {
+  public static decodeJwtPayload(token: string) {
+    const parts = token.split(".");
+    if (parts.length !== 3) {
+      throw new Error("Access Token inválido");
+    }
+
+    const payloadBase64 = parts[1];
+
+    const base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+
+    const obj = JSON.parse(jsonPayload) as AccessTokenPayload;
+
+    if (!obj.antifraudService || !obj.sellerId || isNaN(obj.sellerId))
+      throw new Error("Access Token inválido");
+
+    return obj;
+  }
+
+  public static dateValidator(value: string) {
+    const expirationDateRegex = /^(0[1-9]|1[0-2])\/(\d{4})$/;
+
+    if (!expirationDateRegex.test(value)) return false;
+
+    if (Number(value.substring(3, 7)) < new Date().getFullYear()) return false;
+
+    if (Number(value.substring(0, 2)) < new Date().getMonth() + 1) return false;
+
+    return true;
+  }
+
+  public static luhnValidator(number: string) {
+    const cleanNumber = number.replace(/\D/g, "");
+    let sum = 0;
+    let shouldDouble = false;
+
+    for (let i = cleanNumber.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleanNumber[i]);
+
+      if (shouldDouble) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+
+      sum += digit;
+      shouldDouble = !shouldDouble;
+    }
+
+    return sum % 10 === 0;
+  }
+}
+
 export class BarteSDK {
   private accessToken: string;
   private fingerPrint: FingerPrint;
+  private htmlHandler: HTMLHandler;
 
   constructor({ accessToken }: BarteSDKConstructorProps) {
     if (!window)
       throw new Error(
-        "Window is not defined, Barte SDK must be used in frontend context!"
+        "O objeto 'window' não está presente! O SDK Barte deve ser usado somente no contexto do Browser!"
       );
 
-    if (!accessToken) throw new Error("Access Token is required!");
+    if (!accessToken) throw new Error("Access Token é obrigatório!");
+
+    const { antifraudService } = SDKUtils.decodeJwtPayload(accessToken);
 
     this.accessToken = accessToken;
 
     this.fingerPrint = new FingerPrint();
+    this.htmlHandler = new HTMLHandler(
+      antifraudService === "NETHONE" || antifraudService === "BARTE"
+        ? { antifraudService }
+        : { antifraudService, buyerUuid: "" }
+    );
   }
 
   public async cardToken({
@@ -29,22 +97,22 @@ export class BarteSDK {
     cardNumber,
     buyerUuid,
   }: CardTokenData): Promise<TokenizeResult> {
-    if (cardNumber.length < 16) throw new Error("Invalid Card Number");
+    if (cardNumber.length < 16) throw new Error("Número de cartão inválido!");
 
-    if (!this.luhnValidator(cardNumber))
-      throw new Error("Invalid Card Number Format");
+    if (!SDKUtils.luhnValidator(cardNumber))
+      throw new Error("Formato do número do cartão é inválido!");
 
-    if (!buyerUuid) throw new Error("Invalid Buyer Uuid");
+    if (!buyerUuid) throw new Error("O uuid do buyer é obrigatório");
 
-    if (!cardHolderName) throw new Error("Invalid Card Holder Name");
+    if (!cardHolderName) throw new Error("O nome do cartão é obrigatório");
 
-    if (!this.dateValidator(cardExpiryDate))
-      throw new Error("Invalid date format");
+    if (!SDKUtils.dateValidator(cardExpiryDate))
+      throw new Error("Formato de data inválido");
 
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
-      throw new Error("Invalid Card CVV");
+      throw new Error("Formato de CVV inválido");
 
-    const iframe = await this.createIframe();
+    const iframe = await this.htmlHandler.createIframe();
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
@@ -60,7 +128,7 @@ export class BarteSDK {
           resolve(messageData);
         }
         reject(message.data);
-        this.getIFrame().remove();
+        this.htmlHandler.getIFrame().remove();
       };
 
       window.addEventListener("message", listener);
@@ -84,65 +152,6 @@ export class BarteSDK {
 
   public async getFingerPrint() {
     return this.fingerPrint.fingerPrint();
-  }
-
-  private getIFrame() {
-    return document.getElementById(
-      "barte-checkout-iframe"
-    ) as HTMLIFrameElement;
-  }
-
-  private createIframe(): Promise<HTMLIFrameElement> {
-    return new Promise((resolve, reject) => {
-      const iframe = document.createElement("iframe");
-      iframe.src = "https://sdk-client.barte.com";
-      iframe.id = "barte-checkout-iframe";
-      iframe.style = "display: none";
-
-      iframe.onload = () => resolve(iframe);
-
-      iframe.onerror = () => reject(new Error("Erro ao carregar iframe"));
-
-      const container = document.querySelector("body");
-      if (!container) {
-        reject(new Error("Elemento body não encontrado!"));
-        return;
-      }
-
-      container.appendChild(iframe);
-    });
-  }
-
-  private dateValidator(value: string) {
-    const expirationDateRegex = /^(0[1-9]|1[0-2])\/(\d{4})$/;
-
-    if (!expirationDateRegex.test(value)) return false;
-
-    if (Number(value.substring(3, 7)) < new Date().getFullYear()) return false;
-
-    if (Number(value.substring(0, 2)) < new Date().getMonth() + 1) return false;
-
-    return true;
-  }
-
-  private luhnValidator(number: string) {
-    const cleanNumber = number.replace(/\D/g, "");
-    let sum = 0;
-    let shouldDouble = false;
-
-    for (let i = cleanNumber.length - 1; i >= 0; i--) {
-      let digit = parseInt(cleanNumber[i]);
-
-      if (shouldDouble) {
-        digit *= 2;
-        if (digit > 9) digit -= 9;
-      }
-
-      sum += digit;
-      shouldDouble = !shouldDouble;
-    }
-
-    return sum % 10 === 0;
   }
 }
 
