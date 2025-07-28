@@ -2,6 +2,7 @@ import { FingerPrint } from "./fingerprint";
 import { HTMLHandler } from "./html_handler";
 import type {
   AccessTokenPayload,
+  AntifraudService,
   BarteSDKConstructorProps,
   CardTokenData,
   TokenizeResult,
@@ -68,6 +69,7 @@ class SDKUtils {
 export class BarteSDK {
   private accessToken: string;
   private fingerPrint: FingerPrint;
+  private antifraudService: AntifraudService;
   private htmlHandler: HTMLHandler;
 
   constructor({ accessToken }: BarteSDKConstructorProps) {
@@ -82,12 +84,21 @@ export class BarteSDK {
 
     this.accessToken = accessToken;
 
+    this.antifraudService = antifraudService;
+
     this.fingerPrint = new FingerPrint();
+  }
+
+  public initializeFingerprintCapture(buyerUuid: string) {
     this.htmlHandler = new HTMLHandler(
-      antifraudService === "NETHONE" || antifraudService === "BARTE"
-        ? { antifraudService }
-        : { antifraudService, buyerUuid: "" }
+      this.antifraudService === "NETHONE" || this.antifraudService === "BARTE"
+        ? { antifraudService: this.antifraudService }
+        : { antifraudService: this.antifraudService, buyerUuid }
     );
+  }
+
+  public commitFingerprintCapture() {
+    if (this.htmlHandler) this.htmlHandler.commitAntifraud();
   }
 
   public async cardToken({
@@ -112,7 +123,7 @@ export class BarteSDK {
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Formato de CVV inválido");
 
-    const iframe = await this.htmlHandler.createIframe();
+    const iframe = await HTMLHandler.createIframe();
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
@@ -128,7 +139,7 @@ export class BarteSDK {
           resolve(messageData);
         }
         reject(message.data);
-        this.htmlHandler.getIFrame().remove();
+        HTMLHandler.removeIframe();
       };
 
       window.addEventListener("message", listener);

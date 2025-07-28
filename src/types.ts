@@ -45,7 +45,7 @@ export type CardTokenData = {
   buyerUuid: string;
 };
 
-type AntifraudService = "NETHONE" | "OSCILAR" | "BARTE";
+export type AntifraudService = "NETHONE" | "OSCILAR" | "BARTE";
 
 export type AccessTokenPayload = {
   sellerId: number;
@@ -53,6 +53,12 @@ export type AccessTokenPayload = {
 };
 
 export type HTMLHandlerProps =
-  | { antifraudService: "NETHONE" }
-  | { antifraudService: "OSCILAR"; buyerUuid: string }
-  | { antifraudService: "BARTE" };
+  | { antifraudService: "NETHONE" | "BARTE" }
+  | { antifraudService: "OSCILAR"; buyerUuid: string };
+
+export type CreateScriptProps = {
+  src: string;
+  id: string;
+  async?: boolean;
+  crossOrigin?: string;
+};
