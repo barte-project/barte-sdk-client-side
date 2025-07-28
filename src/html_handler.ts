@@ -15,6 +15,8 @@ export class HTMLHandler {
   }
 
   public commitAntifraud() {
+    if (this.antifraudService !== "OSCILAR") return;
+
     if (this.antifraudService === "OSCILAR" && !this.buyerUuid)
       throw new Error(
         `Buyer uuid é obrigatório para o serviço de antifraude ${this.antifraudService}`
