@@ -5,8 +5,6 @@ import type {
 } from "./types";
 
 export class HTMLHandler {
-  private attemptReference: string;
-  private buyerUuid?: string;
   private antifraudService: AntifraudService;
 
   constructor({ antifraudService }: HTMLHandlerProps) {
@@ -17,19 +15,9 @@ export class HTMLHandler {
   public commitAntifraud() {
     if (this.antifraudService !== "OSCILAR") return;
 
-    if (this.antifraudService === "OSCILAR" && !this.buyerUuid)
-      throw new Error(
-        `Buyer uuid é obrigatório para o serviço de antifraude ${this.antifraudService}`
-      );
-
     const w = window as any;
     let __ojsdk__ = (w["__ojsdk__"] = w["__ojsdk__"] || {});
     __ojsdk__["commit"] = __ojsdk__["commit"] || [];
-
-    __ojsdk__["commit"].push({
-      userID: this.buyerUuid,
-      sessionID: this.attemptReference,
-    });
   }
 
   public static getIFrame(): HTMLIFrameElement {
@@ -85,11 +73,7 @@ export class HTMLHandler {
   }
 
   private generateAttemptReference(): string {
-    const attemptReference = crypto.randomUUID();
-
-    this.attemptReference = attemptReference;
-
-    return attemptReference;
+    return crypto.randomUUID();
   }
 
   private createNethoneScript() {
@@ -131,7 +115,7 @@ export class HTMLHandler {
 
     this.createScript({
       id: OSCILAR_SCRIPT_ID,
-      src: "https://zqp{-sand?}.oscilar.com/{envID}/loader.js",
+      src: "https://zqp-sand.oscilar.com/8net82zi/loader.js",
     });
 
     this.generateAttemptReference();
