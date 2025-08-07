@@ -1,11 +1,9 @@
-// build.js
 const esbuild = require("esbuild");
 const { execSync } = require("child_process");
 const path = require("path");
 const fs = require("fs")
 
-// Gera os arquivos de tipos
-execSync("tsc", { stdio: "inherit" });
+execSync("tsc --declaration --emitDeclarationOnly --outDir dist")
 
 // Faz o bundle para uso em browser e por import
 esbuild.build({
@@ -20,7 +18,7 @@ esbuild.build({
 
 // Faz o bundle para uso em browser e por import
 esbuild.build({
-    entryPoints: ["src/sdk.ts"],
+    entryPoints: ["src/index.ts"],
     bundle: true,
     minify: true,
     sourcemap: false,
@@ -30,27 +28,43 @@ esbuild.build({
     target: ["es2018"],
 }).catch(() => process.exit(1));
 
-// Também cria versão para import (ESM)
+const entryPoints = ["src/index.ts", "src/domain/card/index.ts", "src/domain/fingerprint/index.ts"]
+
+// Builda os pacotes separados com esm (para ser usado com 'import')
 esbuild.build({
-    entryPoints: ["src/sdk.ts"],
-    bundle: true,
-    minify: true,
-    format: "esm",
-    outfile: "dist/sdk.esm.js",
-    target: ["es2018"],
+    entryPoints,
+    bundle: false,
+    splitting: true,
+    format: 'esm',
+    outdir: 'dist/esm',
+    target: ['esnext'],
+    sourcemap: true,
+    outbase: 'src',
 }).catch(() => process.exit(1));
 
-// Também cria versão para CommonJS (Node/React)
+/**
+ * Builda os pacotes em cjs (para serem usados com 'require') 
+ * Estão sendo buildados em separados pois o esbuild não suporta build único para arquivos cjs
+ * */
 esbuild.build({
-    entryPoints: ["src/sdk.ts"],
+    entryPoints: ["src/index.ts"],
     bundle: true,
-    minify: true,
+    minify: false,
     format: "cjs",
-    outfile: "dist/sdk.cjs.js",
-    target: ["es2018"],
+    outfile: "dist/cjs/index.cjs.js",
+    target: ["esnext"],
 }).catch(() => process.exit(1));
 
-// 5. Copia index.html para dist/
+esbuild.build({
+    entryPoints: ["src/domain/card/index.ts"],
+    bundle: true,
+    minify: false,
+    format: "cjs",
+    outfile: "dist/cjs/domain/card/index.cjs.js",
+    target: ["esnext"],
+}).catch(() => process.exit(1));
+
+// Copia index.html para dist/
 const htmlSourceIndex = path.resolve(__dirname, "src", "index.html");
 const htmlDestIndex = path.resolve(__dirname, "dist", "index.html");
 

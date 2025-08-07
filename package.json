@@ -5,9 +5,6 @@
     "name": "Gabriel Silva",
     "email": "gabriel.silva@barte.com"
   },
-  "main": "dist/sdk.cjs.js",
-  "module": "dist/sdk.esm.js",
-  "types": "dist/types/sdk.d.ts",
   "license": "ISC",
   "scripts": {
     "build": "node build.js",
@@ -18,5 +15,19 @@
     "serve": "^14.2.4",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs.js",
+      "default": "./dist/esm/index.js"
+    },
+    "./card": {
+      "types": "./dist/types/domain/card/index.d.ts",
+      "import": "./dist/esm/domain/card/index.js",
+      "require": "./dist/cjs/domain/card/index.cjs.js",
+      "default": "./dist/esm/domain/card/index.js"
+    }
   }
 }
