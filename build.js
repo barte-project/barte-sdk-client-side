@@ -18,7 +18,7 @@ esbuild.build({
 
 // Faz o bundle para uso em browser e por import
 esbuild.build({
-    entryPoints: ["src/index.ts"],
+    entryPoints: ["src/domain/index.ts"],
     bundle: true,
     minify: true,
     sourcemap: false,
@@ -28,7 +28,7 @@ esbuild.build({
     target: ["es2018"],
 }).catch(() => process.exit(1));
 
-const entryPoints = ["src/index.ts", "src/domain/card/index.ts", "src/domain/fingerprint/index.ts"]
+const entryPoints = ["src/domain/index.ts", "src/domain/card/index.ts", "src/domain/fingerprint/index.ts"]
 
 // Builda os pacotes separados com esm (para ser usado com 'import')
 esbuild.build({
@@ -47,7 +47,7 @@ esbuild.build({
  * Estão sendo buildados em separados pois o esbuild não suporta build único para arquivos cjs
  * */
 esbuild.build({
-    entryPoints: ["src/index.ts"],
+    entryPoints: ["src/domain/index.ts"],
     bundle: true,
     minify: false,
     format: "cjs",
