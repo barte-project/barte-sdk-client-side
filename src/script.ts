@@ -1,6 +1,5 @@
 window.addEventListener("DOMContentLoaded", () => {
-  const API_URL =
-    "https://bff.pcip.barte.com/service/payment/v1/sdk/card-tokens";
+  const API_URL = import.meta.env.apiUrl;
 
   async function httpRequest(data: any) {
     const bodyData = { ...data };
@@ -35,7 +34,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (eventData.type === "submitForm") {
       const result = await httpRequest(eventData.data);
-      window.parent.postMessage(result, "https://sdk-client.barte.com/");
+      window.parent.postMessage(result, import.meta.env.iframeUrl);
     }
   });
 });

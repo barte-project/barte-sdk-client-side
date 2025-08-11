@@ -1,9 +1,16 @@
+require("dotenv").config();
 const esbuild = require("esbuild");
 const { execSync } = require("child_process");
 const path = require("path");
 const fs = require("fs")
 
 execSync("tsc --declaration --emitDeclarationOnly --outDir dist")
+
+const env = {
+    'import.meta.env.iframeUrl': `"${process.env.IFRAME_URL}"`,
+    'import.meta.env.iframeScriptUrl': `"${process.env.IFRAME_SCRIPT_URL}"`,
+    'import.meta.env.apiUrl': `"${process.env.API_URL}"`,
+}
 
 // Faz o bundle para uso em browser e por import
 esbuild.build({
@@ -13,7 +20,8 @@ esbuild.build({
     sourcemap: false,
     outfile: "dist/script.min.js",
     format: "iife", // Imediatamente executado no browser
-    target: ["es2018"],
+    target: ["esnext"],
+    define: env
 }).catch(() => process.exit(1));
 
 // Faz o bundle para uso em browser e por import
@@ -25,10 +33,10 @@ esbuild.build({
     outfile: "dist/sdk.min.js",
     format: "iife", // Imediatamente executado no browser
     globalName: "BarteSdk", // Exposto como window.BarteSdk
-    target: ["es2018"],
+    target: ["esnext"],
 }).catch(() => process.exit(1));
 
-const entryPoints = ["src/domain/index.ts", "src/domain/card/index.ts", "src/domain/fingerprint/index.ts"]
+const entryPoints = ["src/domain/index.ts", "src/domain/card/index.ts", "src/domain/fingerprint/index.ts", "src/domain/iframe/utils.ts"]
 
 // Builda os pacotes separados com esm (para ser usado com 'import')
 esbuild.build({
@@ -40,6 +48,7 @@ esbuild.build({
     target: ['esnext'],
     sourcemap: true,
     outbase: 'src',
+    define: env
 }).catch(() => process.exit(1));
 
 /**
@@ -62,6 +71,7 @@ esbuild.build({
     format: "cjs",
     outfile: "dist/cjs/domain/card/index.cjs.js",
     target: ["esnext"],
+    define: env
 }).catch(() => process.exit(1));
 
 // Copia index.html para dist/

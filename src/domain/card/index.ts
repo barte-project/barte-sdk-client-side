@@ -1,7 +1,7 @@
-import type { CardTokenData, TokenizeResult } from "./types";
-import { Iframe } from "../iframe/index";
-import { dateValidator, luhnValidator } from "./utils";
+import { createIframe, removeIframe } from "../iframe/utils";
 import { WebConstructor } from "../web-constructor";
+import type { CardTokenData, TokenizeResult } from "./types";
+import { dateValidator, luhnValidator } from "./utils";
 
 export class BarteCard extends WebConstructor {
   constructor(accessToken: string) {
@@ -30,7 +30,7 @@ export class BarteCard extends WebConstructor {
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Formato de CVV inválido");
 
-    const iframe = await Iframe.createIframe();
+    const iframe = await createIframe();
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
@@ -46,7 +46,7 @@ export class BarteCard extends WebConstructor {
           resolve(messageData);
         }
         reject(message.data);
-        Iframe.getIFrame().remove();
+        removeIframe();
       };
 
       window.addEventListener("message", listener);
@@ -63,7 +63,7 @@ export class BarteCard extends WebConstructor {
             accessToken: this.accessToken,
           },
         },
-        "https://sdk-client.barte.com/script.min.js"
+        import.meta.env.iframeScriptUrl
       );
     });
   }

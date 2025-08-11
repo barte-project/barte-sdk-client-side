@@ -29,5 +29,8 @@
       "require": "./dist/cjs/domain/card/index.cjs.js",
       "default": "./dist/esm/domain/card/index.js"
     }
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1"
   }
 }
