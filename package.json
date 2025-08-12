@@ -28,6 +28,12 @@
       "import": "./dist/esm/domain/card/index.js",
       "require": "./dist/cjs/domain/card/index.cjs.js",
       "default": "./dist/esm/domain/card/index.js"
+    },
+    "./antifraud/fingerprint": {
+      "types": "./dist/types/domain/antifraud/fingerprint/index.d.ts",
+      "import": "./dist/esm/domain/antifraud/fingerprint/index.js",
+      "require": "./dist/cjs/domain/antifraud/fingerprint/index.cjs.js",
+      "default": "./dist/esm/domain/antifraud/fingerprint/index.js"
     }
   },
   "dependencies": {
