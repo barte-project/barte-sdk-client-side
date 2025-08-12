@@ -12,7 +12,8 @@
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
     "moduleResolution": "node",
-    "types": ["./root.d.ts"]
+    "types": ["./root.d.ts"],
+    "strictPropertyInitialization": false
   },
   "include": ["src"]
 }
