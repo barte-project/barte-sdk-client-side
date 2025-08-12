@@ -1,20 +1,23 @@
 import type { BarteSDKConstructorProps } from "../types";
 import { BarteCard } from "./card/index";
-import { CardTokenData, TokenizeResult } from "./card/types";
 import { WebConstructor } from "./web-constructor";
 
 export class BarteSDK extends WebConstructor {
-  private cardContext: BarteCard;
+  private cardContext: BarteCard | undefined;
 
   constructor({ accessToken }: BarteSDKConstructorProps) {
     super(accessToken);
-
-    this.cardContext = new BarteCard(accessToken);
   }
 
-  public get card() {
+  private getCardInstance() {
+    const instance = this.cardContext ?? new BarteCard(this.accessToken);
+    if (!this.cardContext) this.cardContext = instance;
+    return instance;
+  }
+
+  public get payment() {
     return {
-      cardToken: this.cardContext.cardToken,
+      card: this.getCardInstance(),
     };
   }
 }
