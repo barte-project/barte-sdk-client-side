@@ -6,6 +6,7 @@ import { decodeJwtPayload } from "./utils";
 export class BarteFingerprint extends WebConstructor {
   private userAgent: string;
   private antifraudService: AntifraudService;
+  private attemptReference: string;
 
   constructor(accessToken: string) {
     super(accessToken);
@@ -61,17 +62,23 @@ export class BarteFingerprint extends WebConstructor {
     };
   }
 
-  public initializeAntifraud() {
-    if (this.antifraudService === "NETHONE") this.createNethoneScript();
-    else if (this.antifraudService === "OSCILAR") this.createOscilarScript();
+  public initialize(): string {
+    if (this.antifraudService === "NETHONE") return this.createNethoneScript();
+    else if (this.antifraudService === "OSCILAR")
+      return this.createOscilarScript();
+    throw new Error("Initialize failed");
   }
 
-  public commitAntifraud() {
+  public commit() {
     if (this.antifraudService !== "OSCILAR") return;
 
     const w = window as any;
     let __ojsdk__ = (w["__ojsdk__"] = w["__ojsdk__"] || {});
     __ojsdk__["commit"] = __ojsdk__["commit"] || [];
+
+    __ojsdk__["commit"].push({
+      attemptReference: this.attemptReference,
+    });
   }
 
   private getBrowserVersion({
@@ -145,7 +152,9 @@ export class BarteFingerprint extends WebConstructor {
   }
 
   private generateAttemptReference(): string {
-    return crypto.randomUUID();
+    const attemptReference = crypto.randomUUID();
+    this.attemptReference = attemptReference;
+    return attemptReference;
   }
 
   private createNethoneScript() {
@@ -180,6 +189,8 @@ export class BarteFingerprint extends WebConstructor {
         });
       }
     };
+
+    return attemptReference;
   }
 
   private createOscilarScript() {
@@ -189,5 +200,7 @@ export class BarteFingerprint extends WebConstructor {
       id: OSCILAR_SCRIPT_ID,
       src: "https://zqp-sand.oscilar.com/8net82zi/loader.js",
     });
+
+    return this.generateAttemptReference();
   }
 }
