@@ -15,7 +15,7 @@ export class BarteFingerprint extends WebConstructor {
     this.userAgent = navigator.userAgent;
   }
 
-  public async barteFingerPrint(): Promise<BarteFingerPrintResult> {
+  private async barteFingerPrint(): Promise<BarteFingerPrintResult> {
     const {
       // @ts-ignore
       deviceMemory,

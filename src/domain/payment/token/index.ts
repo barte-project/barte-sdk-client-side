@@ -1,14 +1,14 @@
-import { createIframe, removeIframe } from "../iframe/utils";
-import { WebConstructor } from "../web-constructor";
+import { createIframe, removeIframe } from "./iframe";
+import { WebConstructor } from "../../web-constructor";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
 
-export class BarteCard extends WebConstructor {
+export class BarteToken extends WebConstructor {
   constructor(accessToken: string) {
     super(accessToken);
   }
 
-  public async cardToken({
+  public async create({
     cardHolderName,
     cardCVV,
     cardExpiryDate,

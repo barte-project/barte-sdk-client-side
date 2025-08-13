@@ -19,20 +19,20 @@
   "exports": {
     ".": {
       "types": "./dist/types/domain/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.cjs.js",
-      "default": "./dist/esm/index.js"
+      "import": "./dist/esm/domain/index.js",
+      "require": "./dist/cjs/index.cjs",
+      "default": "./dist/esm/domain/index.js"
     },
-    "./card": {
-      "types": "./dist/types/domain/card/index.d.ts",
-      "import": "./dist/esm/domain/card/index.js",
-      "require": "./dist/cjs/domain/card/index.cjs.js",
-      "default": "./dist/esm/domain/card/index.js"
+    "./token": {
+      "types": "./dist/types/domain/payment/token/index.d.ts",
+      "import": "./dist/esm/domain/payment/token/index.js",
+      "require": "./dist/cjs/domain/payment/token/index.cjs",
+      "default": "./dist/esm/domain/payment/token/index.js"
     },
-    "./antifraud/fingerprint": {
+    "./fingerprint": {
       "types": "./dist/types/domain/antifraud/fingerprint/index.d.ts",
       "import": "./dist/esm/domain/antifraud/fingerprint/index.js",
-      "require": "./dist/cjs/domain/antifraud/fingerprint/index.cjs.js",
+      "require": "./dist/cjs/domain/antifraud/fingerprint/index.cjs",
       "default": "./dist/esm/domain/antifraud/fingerprint/index.js"
     }
   },
