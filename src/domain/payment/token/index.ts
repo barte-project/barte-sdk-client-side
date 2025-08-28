@@ -2,10 +2,12 @@ import { createIframe, removeIframe } from "./iframe";
 import { WebConstructor } from "../../web-constructor";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
+import { Environment } from "../../../config/env";
+import { BarteSDKConstructorProps } from "../../../types";
 
 export class BarteToken extends WebConstructor {
-  constructor(accessToken: string) {
-    super(accessToken);
+  constructor({ accessToken, environment }: BarteSDKConstructorProps) {
+    super({ accessToken, environment });
   }
 
   public async create({
@@ -30,7 +32,7 @@ export class BarteToken extends WebConstructor {
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Formato de CVV inválido");
 
-    const iframe = await createIframe();
+    const iframe = await createIframe(this.environment);
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
@@ -61,9 +63,10 @@ export class BarteToken extends WebConstructor {
             number: cardNumber,
             buyerUuid,
             accessToken: this.accessToken,
+            environment: this.environment,
           },
         },
-        import.meta.env.iframeScriptUrl
+        Environment.getInstance(this.environment).getEnv.iframeScriptUrl
       );
     });
   }

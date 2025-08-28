@@ -1,16 +1,9 @@
-require("dotenv").config();
 const esbuild = require("esbuild");
 const { execSync } = require("child_process");
 const path = require("path");
 const fs = require("fs")
 
 execSync("tsc --declaration --emitDeclarationOnly --outDir dist")
-
-const env = {
-    'import.meta.env.iframeUrl': `"${process.env.IFRAME_URL}"`,
-    'import.meta.env.iframeScriptUrl': `"${process.env.IFRAME_SCRIPT_URL}"`,
-    'import.meta.env.apiUrl': `"${process.env.API_URL}"`,
-}
 
 // Faz o bundle para uso em browser e por import
 esbuild.build({
@@ -21,7 +14,6 @@ esbuild.build({
     outfile: "dist/script.min.js",
     format: "iife", // Imediatamente executado no browser
     target: ["esnext"],
-    define: env
 }).catch(() => process.exit(1));
 
 // Faz o bundle para uso em browser e por import
@@ -36,7 +28,7 @@ esbuild.build({
     target: ["esnext"],
 }).catch(() => process.exit(1));
 
-const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/checkout/index.ts", "src/domain/payment/index.ts", "src/domain/antifraud/fingerprint/index.ts"]
+const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/token/iframe.ts", "src/domain/payment/token/utils.ts", "src/domain/payment/checkout/index.ts", "src/domain/payment/checkout/api.ts", "src/domain/payment/index.ts", "src/domain/antifraud/fingerprint/index.ts", "src/domain/antifraud/fingerprint/utils.ts", "src/domain/web-constructor.ts", "src/config/env.ts"]
 
 // Builda os pacotes separados com esm (para ser usado com 'import')
 esbuild.build({
@@ -48,7 +40,6 @@ esbuild.build({
     target: ['esnext'],
     sourcemap: true,
     outbase: 'src',
-    define: env
 }).catch(() => process.exit(1));
 
 /**
@@ -71,7 +62,6 @@ esbuild.build({
     format: "cjs",
     outfile: "dist/cjs/domain/payment/token/index.cjs",
     target: ["esnext"],
-    define: env
 }).catch(() => process.exit(1));
 
 esbuild.build({
@@ -81,7 +71,6 @@ esbuild.build({
     format: "cjs",
     outfile: "dist/cjs/domain/payment/checkout/index.cjs",
     target: ["esnext"],
-    define: env
 }).catch(() => process.exit(1));
 
 esbuild.build({
@@ -91,7 +80,6 @@ esbuild.build({
     format: "cjs",
     outfile: "dist/cjs/domain/antifraud/fingerprint/index.cjs",
     target: ["esnext"],
-    define: env
 }).catch(() => process.exit(1));
 
 // Copia index.html para dist/

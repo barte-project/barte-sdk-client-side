@@ -1,12 +1,14 @@
-window.addEventListener("DOMContentLoaded", () => {
-  const API_URL = import.meta.env.apiUrl;
+import { Environment } from "./config/env";
 
+window.addEventListener("DOMContentLoaded", () => {
   async function httpRequest(data: any) {
     const bodyData = { ...data };
     delete bodyData.accessToken;
+    delete bodyData.environment;
+    const env = Environment.getInstance(data.environment);
 
     try {
-      const requestResult = await fetch(API_URL, {
+      const requestResult = await fetch(env.getEnv.apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,10 +33,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("message", async (ev) => {
     const eventData = ev.data;
+    const env = Environment.getInstance(eventData.environment);
 
     if (eventData.type === "submitForm") {
       const result = await httpRequest(eventData.data);
-      window.parent.postMessage(result, import.meta.env.iframeUrl);
+      window.parent.postMessage(result, env.getEnv.iframeUrl);
     }
   });
 });

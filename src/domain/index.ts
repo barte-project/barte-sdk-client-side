@@ -9,19 +9,31 @@ export class BarteSDK extends WebConstructor {
   private fingerprintContext: BarteFingerprint | null = null;
   private walletContext: BarteWallet | null = null;
 
-  constructor({ accessToken }: BarteSDKConstructorProps) {
-    super(accessToken);
+  constructor({
+    accessToken,
+    environment = "production",
+  }: BarteSDKConstructorProps) {
+    super({ accessToken, environment });
   }
 
   private getCardInstance() {
-    const instance = this.cardContext ?? new BarteToken(this.accessToken);
+    const instance =
+      this.cardContext ??
+      new BarteToken({
+        accessToken: this.accessToken,
+        environment: this.environment,
+      });
     if (!this.cardContext) this.cardContext = instance;
     return instance;
   }
 
   private getFingerprintInstance() {
     const instance =
-      this.fingerprintContext ?? new BarteFingerprint(this.accessToken);
+      this.fingerprintContext ??
+      new BarteFingerprint({
+        accessToken: this.accessToken,
+        environment: this.environment,
+      });
 
     if (!this.fingerprintContext) this.fingerprintContext = instance;
 
@@ -29,7 +41,12 @@ export class BarteSDK extends WebConstructor {
   }
 
   private getBarteWallet() {
-    const instance = this.walletContext ?? new BarteWallet(this.accessToken);
+    const instance =
+      this.walletContext ??
+      new BarteWallet({
+        accessToken: this.accessToken,
+        environment: this.environment,
+      });
     if (!this.walletContext) this.walletContext = instance;
     return instance;
   }
@@ -46,7 +63,6 @@ export class BarteSDK extends WebConstructor {
       fingerprint: this.getFingerprintInstance(),
     };
   }
-
 }
 
 (window as any).BarteSDK = BarteSDK;

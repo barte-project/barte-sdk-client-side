@@ -2,6 +2,7 @@ import { WebConstructor } from "../../web-constructor";
 import { loadScript } from "@yuno-payments/sdk-web";
 import ApiClient from "./api";
 import { YunoInstance } from "@yuno-payments/sdk-web-types";
+import { BarteSDKConstructorProps } from "../../../types";
 interface Amount {
   currency: "BRL" | string;
   value: number;
@@ -21,8 +22,8 @@ export class BarteWallet extends WebConstructor {
   private apiClient: ApiClient;
   private yuno?: YunoInstance;
   // https://sandbox-bff.barte.com/service/payment/v1/session
-  constructor(accessToken: string) {
-    super(accessToken);
+  constructor({ accessToken, environment }: BarteSDKConstructorProps) {
+    super({ accessToken, environment });
     this.apiClient = new ApiClient(accessToken);
   }
   private actualDate(): string {

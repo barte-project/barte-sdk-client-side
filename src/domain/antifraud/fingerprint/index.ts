@@ -1,3 +1,4 @@
+import { BarteSDKConstructorProps } from "../../../types";
 import { WebConstructor } from "../../web-constructor";
 import { AntifraudService } from "../types";
 import type { BarteFingerPrintResult, CreateScriptProps } from "./types";
@@ -8,8 +9,8 @@ export class BarteFingerprint extends WebConstructor {
   private antifraudService: AntifraudService;
   private attemptReference: string;
 
-  constructor(accessToken: string) {
-    super(accessToken);
+  constructor({ accessToken, environment }: BarteSDKConstructorProps) {
+    super({ accessToken, environment });
     const { antifraudService } = decodeJwtPayload(accessToken);
     this.antifraudService = antifraudService;
     this.userAgent = navigator.userAgent;

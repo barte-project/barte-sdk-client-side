@@ -1,7 +1,11 @@
+import { EnvironmentType } from "../config/env";
+import { BarteSDKConstructorProps } from "../types";
+
 export abstract class WebConstructor {
   protected accessToken: string;
+  protected environment: EnvironmentType;
 
-  constructor(accessToken: string) {
+  constructor({ accessToken, environment }: BarteSDKConstructorProps) {
     if (!window)
       throw new Error(
         "O objeto 'window' não está presente! O SDK Barte deve ser usado somente no contexto do Browser!"
@@ -10,5 +14,6 @@ export abstract class WebConstructor {
     if (!accessToken) throw new Error("Access Token é obrigatório!");
 
     this.accessToken = accessToken;
+    this.environment = environment ?? "production";
   }
 }
