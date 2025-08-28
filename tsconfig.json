@@ -12,7 +12,7 @@
     "forceConsistentCasingInFileNames": true,
     "removeComments": true,
     "moduleResolution": "node",
-    "types": ["./root.d.ts"],
+    "types": ["./root.d.ts", "@yuno-payments/sdk-web-types/dist/global"],
     "strictPropertyInitialization": false
   },
   "include": ["src"]

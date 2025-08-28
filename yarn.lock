@@ -182,6 +182,18 @@
   resolved "https://registry.yarnpkg.com/@types/strip-json-comments/-/strip-json-comments-0.0.30.tgz#9aa30c04db212a9a0649d6ae6fd50accc40748a1"
   integrity sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==
 
+"@yuno-payments/sdk-web-types@^4.0.0", "@yuno-payments/sdk-web-types@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@yuno-payments/sdk-web-types/-/sdk-web-types-4.1.0.tgz#aeb8eb6894c51f45f6f37ca21a956bb42048e977"
+  integrity sha512-VK46E6kSeTIDN5Eo2uayUu3rVOtH4XLmpCs1tyCgIeVaCD4iIaQhqR6xVkvgwy0tqup21WsINQjC5TMrwY6aIA==
+
+"@yuno-payments/sdk-web@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@yuno-payments/sdk-web/-/sdk-web-2.0.0.tgz#669757bf34ae1419d7b4cc77661e5e6d6762f0a6"
+  integrity sha512-RQpjLX8Xjs1v1DwVkwVUOYlMmDlp5uA5Rf7C/TCVwE/M5dDyf++IHu6uBJiAAlPpXQtCGPoVRP0Qko+tuZfp4g==
+  dependencies:
+    "@yuno-payments/sdk-web-types" "^4.0.0"
+
 "@zeit/schemas@2.36.0":
   version "2.36.0"
   resolved "https://registry.yarnpkg.com/@zeit/schemas/-/schemas-2.36.0.tgz#7a1b53f4091e18d0b404873ea3e3c83589c765f2"

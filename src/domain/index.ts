@@ -1,11 +1,13 @@
 import type { BarteSDKConstructorProps } from "../types";
 import { BarteFingerprint } from "./antifraud/fingerprint";
+import { BarteWallet } from "./payment/checkout";
 import { BarteToken } from "./payment/token/index";
 import { WebConstructor } from "./web-constructor";
 
 export class BarteSDK extends WebConstructor {
   private cardContext: BarteToken | null = null;
   private fingerprintContext: BarteFingerprint | null = null;
+  private walletContext: BarteWallet | null = null;
 
   constructor({ accessToken }: BarteSDKConstructorProps) {
     super(accessToken);
@@ -26,9 +28,16 @@ export class BarteSDK extends WebConstructor {
     return instance;
   }
 
+  private getBarteWallet() {
+    const instance = this.walletContext ?? new BarteWallet(this.accessToken);
+    if (!this.walletContext) this.walletContext = instance;
+    return instance;
+  }
+
   public get payment() {
     return {
       card: this.getCardInstance(),
+      checkout: this.getBarteWallet(),
     };
   }
 
@@ -37,6 +46,7 @@ export class BarteSDK extends WebConstructor {
       fingerprint: this.getFingerprintInstance(),
     };
   }
+
 }
 
 (window as any).BarteSDK = BarteSDK;
