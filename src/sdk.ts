@@ -55,6 +55,7 @@ export class BarteSDK {
           if (Array.isArray(messageData.errors) && messageData.errors.length)
             reject(messageData);
 
+          console.log({ messageData });
           resolve(messageData);
         }
         reject(message.data);
