@@ -1,6 +1,6 @@
 {
   "name": "barte-sdk-web",
-  "version": "00000",
+  "version": "0.0.1",
   "author": {
     "name": "Gabriel Silva",
     "email": "gabriel.silva@barte.com"
@@ -24,23 +24,41 @@
       "require": "./dist/cjs/index.cjs",
       "default": "./dist/esm/domain/index.js"
     },
-    "./token": {
+    "./payment/token": {
       "types": "./dist/types/domain/payment/token/index.d.ts",
       "import": "./dist/esm/domain/payment/token/index.js",
       "require": "./dist/cjs/domain/payment/token/index.cjs",
       "default": "./dist/esm/domain/payment/token/index.js"
-    },
-    "./fingerprint": {
-      "types": "./dist/types/domain/antifraud/fingerprint/index.d.ts",
-      "import": "./dist/esm/domain/antifraud/fingerprint/index.js",
-      "require": "./dist/cjs/domain/antifraud/fingerprint/index.cjs",
-      "default": "./dist/esm/domain/antifraud/fingerprint/index.js"
     },
     "./payment/checkout": {
       "types": "./dist/types/domain/payment/checkout/index.d.ts",
       "import": "./dist/esm/domain/payment/checkout/index.js",
       "require": "./dist/cjs/domain/payment/checkout/index.cjs",
       "default": "./dist/esm/domain/payment/checkout/index.js"
+    },
+    "./payment/*": {
+      "types": "./dist/types/domain/payment/*.d.ts",
+      "import": "./dist/esm/domain/payment/*.js",
+      "require": "./dist/cjs/domain/payment/*.cjs",
+      "default": "./dist/esm/domain/payment/*.js"
+    },
+    "./antifraud": {
+      "types": "./dist/types/domain/antifraud/index.d.ts",
+      "import": "./dist/esm/domain/antifraud/index.js",
+      "require": "./dist/cjs/domain/antifraud/index.cjs",
+      "default": "./dist/esm/domain/antifraud/index.js"
+    },
+    "./antifraud/fingerprint": {
+      "types": "./dist/types/domain/antifraud/fingerprint/index.d.ts",
+      "import": "./dist/esm/domain/antifraud/fingerprint/index.js",
+      "require": "./dist/cjs/domain/antifraud/fingerprint/index.cjs",
+      "default": "./dist/esm/domain/antifraud/fingerprint/index.js"
+    },
+    "./antifraud/*": {
+      "types": "./dist/types/domain/antifraud/*.d.ts",
+      "import": "./dist/esm/domain/antifraud/*.js",
+      "require": "./dist/cjs/domain/antifraud/*.cjs",
+      "default": "./dist/esm/domain/antifraud/*.js"
     }
   },
   "dependencies": {

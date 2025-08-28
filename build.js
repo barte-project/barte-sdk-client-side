@@ -36,7 +36,7 @@ esbuild.build({
     target: ["esnext"],
 }).catch(() => process.exit(1));
 
-const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/checkout/index.ts", "src/domain/antifraud/fingerprint/index.ts"]
+const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/checkout/index.ts", "src/domain/payment/index.ts", "src/domain/antifraud/fingerprint/index.ts"]
 
 // Builda os pacotes separados com esm (para ser usado com 'import')
 esbuild.build({
@@ -70,6 +70,16 @@ esbuild.build({
     minify: false,
     format: "cjs",
     outfile: "dist/cjs/domain/payment/token/index.cjs",
+    target: ["esnext"],
+    define: env
+}).catch(() => process.exit(1));
+
+esbuild.build({
+    entryPoints: ["src/domain/payment/checkout/index.ts"],
+    bundle: true,
+    minify: false,
+    format: "cjs",
+    outfile: "dist/cjs/domain/payment/checkout/index.cjs",
     target: ["esnext"],
     define: env
 }).catch(() => process.exit(1));
