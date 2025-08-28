@@ -1,18 +1,21 @@
 import { WebConstructor } from "../../web-constructor";
-import { loadScript } from '@yuno-payments/sdk-web';
+import { loadScript } from "@yuno-payments/sdk-web";
 import ApiClient from "./api";
-import { YunoInstance } from '@yuno-payments/sdk-web-types'
-interface Amount { currency: "BRL" | string; value: number; }
+import { YunoInstance } from "@yuno-payments/sdk-web-types";
+interface Amount {
+  currency: "BRL" | string;
+  value: number;
+}
 interface StartOptions {
-  element: string;                 // Ex: "#root"
-  publicKey: string;               // NÃO hardcode no fonte
-  country?: string;                // default "BR"
-  language?: "pt" | "en" | "es";   // default "pt"
+  element: string; // Ex: "#root"
+  publicKey: string; // NÃO hardcode no fonte
+  country?: string; // default "BR"
+  language?: "pt" | "en" | "es"; // default "pt"
   buyerId: string;
   amount: Amount;
-  method: string;                  // ex: "WALLET"
+  method: string; // ex: "WALLET"
   paymentDescription?: string;
-  apiToken: string;                // para seu backend (orders)
+  apiToken: string; // para seu backend (orders)
 }
 export class BarteWallet extends WebConstructor {
   private apiClient: ApiClient;
@@ -34,13 +37,20 @@ export class BarteWallet extends WebConstructor {
     return Number(String(v).replace(/\./g, "").replace(",", "."));
   }
 
-  private async ensureYunoInitialized(publicKey: string): Promise<YunoInstance> {
+  private async ensureYunoInitialized(
+    publicKey: string
+  ): Promise<YunoInstance> {
     if (this.yuno) return this.yuno;
     const sdk = await loadScript();
     this.yuno = await sdk.initialize(publicKey);
     return this.yuno;
   }
-  private buildPaymentPayload(opts: StartOptions, oneTimeToken: string, uuidSession: string, uuidIntegration: string) {
+  private buildPaymentPayload(
+    opts: StartOptions,
+    oneTimeToken: string,
+    uuidSession: string,
+    uuidIntegration: string
+  ) {
     return {
       startDate: this.actualDate(),
       value: this.parseAmountValue(opts.amount.value),
@@ -77,17 +87,31 @@ export class BarteWallet extends WebConstructor {
     };
   }
 
-  private async createPaymentOrder(opts: StartOptions, oneTimeToken: string, uuidSession: string, uuidIntegration: string) {
+  private async createPaymentOrder(
+    opts: StartOptions,
+    oneTimeToken: string,
+    uuidSession: string,
+    uuidIntegration: string
+  ) {
     const url = "https://sandbox-bff.barte.com/service/payment/v1/orders";
     const headers = {
       "X-Token-Api": opts.apiToken,
       "Content-Type": "application/json",
       "x-idempotency-key": crypto.randomUUID(),
     };
-    const body = this.buildPaymentPayload(opts, oneTimeToken, uuidSession, uuidIntegration);
+    const body = this.buildPaymentPayload(
+      opts,
+      oneTimeToken,
+      uuidSession,
+      uuidIntegration
+    );
 
     // Ideal: usar seu ApiClient (ex.: this.apiClient.createOrder(body))
-    const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
     if (!res.ok) {
       const text = await res.text();
       throw new Error(`Erro ao criar order: ${res.status} ${text}`);
@@ -172,7 +196,10 @@ export class BarteWallet extends WebConstructor {
     const merchantId = crypto.randomUUID();
     const sessionData = await this.apiClient.createSession({
       country: opts.country ?? "BR",
-      amount: { currency: opts.amount.currency || "BRL", value: this.parseAmountValue(opts.amount.value) },
+      amount: {
+        currency: opts.amount.currency || "BRL",
+        value: this.parseAmountValue(opts.amount.value),
+      },
       uuidBuyer: opts.buyerId,
       merchantOrderId: merchantId,
       paymentDescription: opts.paymentDescription || "",
@@ -194,7 +221,12 @@ export class BarteWallet extends WebConstructor {
       // 3) callback de criação de pagamento
       yunoCreatePayment: async (oneTimeToken: string) => {
         try {
-          await this.createPaymentOrder(opts, oneTimeToken, uuidSession, uuidIntegration);
+          await this.createPaymentOrder(
+            opts,
+            oneTimeToken,
+            uuidSession,
+            uuidIntegration
+          );
           await yuno.continuePayment({ showPaymentStatus: true });
         } catch (err) {
           console.error("Erro ao criar pagamento:", err);
