@@ -75,7 +75,7 @@ export class BarteSDK {
             accessToken: this.accessToken,
           },
         },
-        "https://sdk-client.barte.com/script.min.js"
+        "https://sandbox-sdk-client.barte.com/script.min.js"
       );
     });
   }
@@ -89,7 +89,7 @@ export class BarteSDK {
   private createIframe(): Promise<HTMLIFrameElement> {
     return new Promise((resolve, reject) => {
       const iframe = document.createElement("iframe");
-      iframe.src = "https://sdk-client.barte.com";
+      iframe.src = "https://sandbox-sdk-client.barte.com";
       iframe.id = "barte-checkout-iframe";
       iframe.style = "display: none";
 
