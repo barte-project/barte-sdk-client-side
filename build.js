@@ -36,7 +36,7 @@ esbuild.build({
     target: ["esnext"],
 }).catch(() => process.exit(1));
 
-const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/antifraud/fingerprint/index.ts"]
+const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/checkout/index.ts", "src/domain/antifraud/fingerprint/index.ts"]
 
 // Builda os pacotes separados com esm (para ser usado com 'import')
 esbuild.build({
