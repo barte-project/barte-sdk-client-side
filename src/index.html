@@ -5,8 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Barte Checkout Form</title>
     <script src="script.min.js"></script>
+    <style>
+      * {
+        border: none;
+        box-sizing: border-box;
+      }
+
+      .input-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    </style>
   </head>
   <body>
-    Barte SDK
+    <form id="barte-tokenize-card-form">
+      <div class="input-container">
+        <label id="barte-card-name-label" for="barte-card-name">Nome</label>
+
+        <input id="barte-card-name" name="cardName" type="text" required />
+      </div>
+
+      <div class="input-container">
+        <label id="barte-card-number-label" for="barte-card-number"
+          >Número</label
+        >
+        <input
+          inputmode="numeric"
+          id="barte-card-number"
+          name="cardNumber"
+          type="text"
+          required
+        />
+      </div>
+
+      <div class="input-container">
+        <label id="barte-card-due-date-label" for="barte-card-due-date"
+          >Data de vencimento</label
+        >
+        <input
+          inputmode="numeric"
+          maxlength="7"
+          id="barte-card-due-date"
+          name="cardDueDate"
+          type="text"
+          required
+        />
+      </div>
+
+      <div class="input-container">
+        <label id="barte-card-cvv-label" for="barte-card-cvv">CVV</label>
+        <input
+          inputmode="numeric"
+          maxlength="4"
+          id="barte-card-cvv"
+          name="cardCvv"
+          type="text"
+          required
+        />
+      </div>
+    </form>
   </body>
 </html>

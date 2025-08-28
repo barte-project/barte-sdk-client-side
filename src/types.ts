@@ -14,8 +14,39 @@ export type TokenizeResult = {
   cardId: string;
 };
 
+export type TokenizeResultCallback = (cardToken: string) => any;
+
 export type BarteSDKConstructorProps = {
   accessToken: string;
+  tokenizeResultCallback: TokenizeResultCallback;
+};
+
+const styleProps = [
+  "border",
+  "backgroundColor",
+  "padding",
+  "height",
+  "fontSize",
+] as const;
+
+type StyleProps = (typeof styleProps)[number];
+
+type StyleObject = {
+  [k in StyleProps]?: string | number;
+};
+
+export type IframeProps = {
+  tokenizeCallback?: (cardToken: string) => any;
+  styles: {
+    container?: StyleObject;
+    // input: {};
+    // errorMessage: {};
+  };
+  inputs?: {
+    cvv?: {
+      label?: string;
+    };
+  };
 };
 
 export type CardTokenData = {

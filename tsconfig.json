@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
+    "target": "esnext",
     "module": "ESNext",
     "declaration": true,
     "outDir": "dist",
@@ -10,7 +10,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "removeComments": true
+    "removeComments": true,
+    "moduleResolution": "node",
+    "allowImportingTsExtensions": true,
+    "strictPropertyInitialization": false
   },
   "include": ["src"]
 }
