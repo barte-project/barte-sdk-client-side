@@ -88,6 +88,7 @@ export class BarteSDK {
 
   private createIframe(): Promise<HTMLIFrameElement> {
     return new Promise((resolve, reject) => {
+      this.getIFrame().remove();
       const iframe = document.createElement("iframe");
       iframe.src = "https://sandbox-sdk-client.barte.com";
       iframe.id = "barte-checkout-iframe";
