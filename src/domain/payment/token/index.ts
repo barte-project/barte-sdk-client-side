@@ -2,7 +2,7 @@ import { createIframe, removeIframe } from "./iframe";
 import { WebConstructor } from "../../web-constructor";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
-import { Environment } from "../../../config/env";
+import { getEnv } from "../../../config/env";
 import { BarteSDKConstructorProps } from "../../../types";
 
 export class BarteToken extends WebConstructor {
@@ -66,7 +66,7 @@ export class BarteToken extends WebConstructor {
             environment: this.environment,
           },
         },
-        Environment.getInstance(this.environment).getEnv.iframeScriptUrl
+        getEnv(this.environment).iframeScriptUrl
       );
     });
   }

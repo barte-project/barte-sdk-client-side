@@ -1,5 +1,7 @@
 type EnvironmentVariables = "iframeUrl" | "iframeScriptUrl" | "apiUrl";
-export type EnvironmentType = "production" | "sandbox" | "dev";
+
+const EnvironmentList = ["production", "sandbox", "dev"] as const;
+export type EnvironmentType = (typeof EnvironmentList)[number];
 
 export const ENV: Record<
   EnvironmentType,
@@ -22,22 +24,14 @@ export const ENV: Record<
   },
 };
 
-export class Environment {
-  private static intance: Environment | null = null;
-  private currentEnv: EnvironmentType;
+export function validateInstance(env: EnvironmentType) {
+  return EnvironmentList.includes(env);
+}
 
-  private constructor(currentEnv: EnvironmentType) {
-    this.currentEnv = currentEnv;
-  }
-
-  public static getInstance(currentEnv: EnvironmentType): Environment {
-    if (!Environment.intance) {
-      Environment.intance = new Environment(currentEnv);
-    }
-    return Environment.intance;
-  }
-
-  public get getEnv() {
-    return ENV[this.currentEnv];
-  }
+export function getEnv(currentEnv: EnvironmentType) {
+  if (!validateInstance(currentEnv))
+    throw new Error(
+      `O ambiente '${currentEnv}' não é um ambiente válido para o SDK!`
+    );
+  return ENV[currentEnv];
 }

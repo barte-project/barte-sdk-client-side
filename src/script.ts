@@ -1,14 +1,13 @@
-import { Environment } from "./config/env";
+import { getEnv } from "./config/env";
 
 window.addEventListener("DOMContentLoaded", () => {
   async function httpRequest(data: any) {
     const bodyData = { ...data };
     delete bodyData.accessToken;
     delete bodyData.environment;
-    const env = Environment.getInstance(data.environment);
 
     try {
-      const requestResult = await fetch(env.getEnv.apiUrl, {
+      const requestResult = await fetch(getEnv(data.environment).apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
