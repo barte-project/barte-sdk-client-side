@@ -37,7 +37,7 @@ export class BarteSDK {
     if (!cardHolderName) throw new Error("Invalid Card Holder Name");
 
     if (!this.dateValidator(cardExpiryDate))
-      throw new Error("Invalid date format");
+      throw new Error("Validation date expired!");
 
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Invalid Card CVV");
@@ -111,11 +111,17 @@ export class BarteSDK {
   private dateValidator(value: string) {
     const expirationDateRegex = /^(0[1-9]|1[0-2])\/(\d{4})$/;
 
-    if (!expirationDateRegex.test(value)) return false;
+    if (!expirationDateRegex.test(value))
+      throw new Error("Formato de data inválido");
 
-    if (Number(value.substring(3, 7)) < new Date().getFullYear()) return false;
+    const currentYear = new Date().getFullYear();
+    const dataYear = Number(value.substring(3, 7));
+    const dataMonth = Number(value.substring(0, 2));
+    const currentMonth = new Date().getMonth() + 1;
 
-    if (Number(value.substring(0, 2)) < new Date().getMonth() + 1) return false;
+    if (dataYear < currentYear) return false;
+
+    if (currentYear === dataYear && dataMonth < currentMonth) return false;
 
     return true;
   }
