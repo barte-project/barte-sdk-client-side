@@ -16,14 +16,14 @@ window.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(bodyData),
       });
 
-      if (requestResult.status === 401)
+      const result = await requestResult.json();
+
+      if (result.errors && Array.isArray(result.errors) && result.errors.length)
         return {
           error: true,
-          errorMessage:
-            "Não autorizado! Token de autenticação inválido ou não disponibilizado.",
+          errorMessage: "Erro ao tokenizar cartão!",
+          errorDetails: result.errors,
         };
-
-      const result = await requestResult.json();
 
       return {
         error: false,
