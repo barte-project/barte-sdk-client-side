@@ -10,17 +10,17 @@ export const ENV: Record<
   dev: {
     apiUrl: "https://dev-bff.barte.com/service/payment/v1/sdk/card-tokens",
     iframeScriptUrl: "https://dev-sdk-client.barte.com/script.min.js", // change
-    iframeUrl: "https://dev-sdk-client.barte.com", // change
+    iframeUrl: "https://dev-sdk-client.barte.com/", // change
   },
   sandbox: {
     apiUrl: "https://sandbox-bff.barte.com/service/payment/v1/sdk/card-tokens",
-    iframeScriptUrl: "https://sandbox-sdk-client.barte.com/script.min.js",
-    iframeUrl: "https://sandbox-sdk-client.barte.com",
+    iframeScriptUrl: "https://dev-sdk-client.barte.com/script.min.js",
+    iframeUrl: "https://dev-sdk-client.barte.com/",
   },
   production: {
     apiUrl: "https://bff.pcip.barte.com/service/payment/v1/sdk/card-tokens",
-    iframeScriptUrl: "https://sdk-client.barte.com/script.min.js",
-    iframeUrl: "https://sdk-client.barte.com",
+    iframeScriptUrl: "https://dev-sdk-client.barte.com/script.min.js",
+    iframeUrl: "https://dev-sdk-client.barte.com/",
   },
 };
 
