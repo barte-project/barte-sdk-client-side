@@ -37,7 +37,7 @@ window.addEventListener("DOMContentLoaded", () => {
       const result = await httpRequest(eventData.data);
       window.parent.postMessage(
         result,
-        "https://sandbox-sdk-client.barte.com/"
+        "https://sandbox-sdk-client.barte.com/sdk.min.js"
       );
     }
   });
