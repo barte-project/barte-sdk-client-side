@@ -1,15 +1,18 @@
 import { EnvironmentType, getEnv } from "../../../config/env";
 
-const getIFrame = (): HTMLIFrameElement | undefined =>
+const getIFrame = (): HTMLIFrameElement | null =>
   document.getElementById("barte-checkout-iframe") as HTMLIFrameElement;
-
-export const removeIframe = () => getIFrame()?.remove();
 
 export function createIframe(
   currentEnvironment: EnvironmentType
 ): Promise<HTMLIFrameElement> {
   return new Promise((resolve, reject) => {
-    removeIframe();
+    const currentIframe = getIFrame();
+
+    if (currentIframe) {
+      resolve(currentIframe);
+      return;
+    }
 
     const iframe = document.createElement("iframe");
     iframe.src = getEnv(currentEnvironment).iframeUrl;

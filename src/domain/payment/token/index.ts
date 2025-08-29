@@ -1,4 +1,4 @@
-import { createIframe, removeIframe } from "./iframe";
+import { createIframe } from "./iframe";
 import { WebConstructor } from "../../web-constructor";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
@@ -27,7 +27,7 @@ export class BarteToken extends WebConstructor {
     if (!cardHolderName) throw new Error("O nome do cartão é obrigatório");
 
     if (!dateValidator(cardExpiryDate))
-      throw new Error("Formato de data inválido");
+      throw new Error("Data de validade expirada!");
 
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Formato de CVV inválido");
@@ -38,6 +38,7 @@ export class BarteToken extends WebConstructor {
       const listener = (message: MessageEvent<any>) => {
         window.removeEventListener("message", listener);
 
+        // isso só vale em casos em que há um error no body, validar para o cenário em que está o status 401
         if (!message.data.error) {
           const messageData = message.data;
 
@@ -48,7 +49,6 @@ export class BarteToken extends WebConstructor {
           resolve(messageData);
         }
         reject(message.data);
-        removeIframe();
       };
 
       window.addEventListener("message", listener);

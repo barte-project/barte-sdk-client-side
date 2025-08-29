@@ -16,6 +16,13 @@ window.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(bodyData),
       });
 
+      if (requestResult.status === 401)
+        return {
+          error: true,
+          errorMessage:
+            "Não autorizado! Token de autenticação inválido ou não disponibilizado.",
+        };
+
       const result = await requestResult.json();
 
       return {
