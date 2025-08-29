@@ -9,7 +9,7 @@ export function createIframe(
   currentEnvironment: EnvironmentType
 ): Promise<HTMLIFrameElement> {
   return new Promise((resolve, reject) => {
-    getIFrame()?.remove();
+    removeIframe();
 
     const iframe = document.createElement("iframe");
     iframe.src = Environment.getInstance(currentEnvironment).getEnv.iframeUrl;

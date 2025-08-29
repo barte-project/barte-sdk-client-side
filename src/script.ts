@@ -33,11 +33,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("message", async (ev) => {
     const eventData = ev.data;
-    const env = Environment.getInstance(eventData.environment);
 
     if (eventData.type === "submitForm") {
       const result = await httpRequest(eventData.data);
-      window.parent.postMessage(result, env.getEnv.iframeUrl);
+      window.parent.postMessage(result, "*");
     }
   });
 });
