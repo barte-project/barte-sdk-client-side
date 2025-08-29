@@ -21,11 +21,17 @@ export function luhnValidator(number: string) {
 export function dateValidator(value: string) {
   const expirationDateRegex = /^(0[1-9]|1[0-2])\/(\d{4})$/;
 
-  if (!expirationDateRegex.test(value)) return false;
+  if (!expirationDateRegex.test(value))
+    throw new Error("Formato de data inválido");
 
-  if (Number(value.substring(3, 7)) < new Date().getFullYear()) return false;
+  const currentYear = new Date().getFullYear();
+  const dataYear = Number(value.substring(3, 7));
+  const dataMonth = Number(value.substring(0, 2));
+  const currentMonth = new Date().getMonth() + 1;
 
-  if (Number(value.substring(0, 2)) < new Date().getMonth() + 1) return false;
+  if (dataYear < currentYear) return false;
+
+  if (currentYear === dataYear && dataMonth < currentMonth) return false;
 
   return true;
 }

@@ -18,6 +18,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
       const result = await requestResult.json();
 
+      if (result.errors && Array.isArray(result.errors) && result.errors.length)
+        return {
+          error: true,
+          errorMessage: "Erro ao tokenizar cartão!",
+          errorDetails: result.errors,
+        };
+
       return {
         error: false,
         data: result,
