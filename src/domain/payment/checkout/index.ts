@@ -106,8 +106,6 @@ export class BarteWallet extends WebConstructor {
       uuidSession,
       uuidIntegration
     );
-
-    // Ideal: usar seu ApiClient (ex.: this.apiClient.createOrder(body))
     const res = await fetch(url, {
       method: "POST",
       headers,
@@ -119,82 +117,16 @@ export class BarteWallet extends WebConstructor {
     }
     return res.json();
   }
-  // public async BarteWallet({ data }: any): Promise<any> {
-  //   const yunoScript = await loadScript();
-  //   const yuno: YunoInstance = await yunoScript.initialize("prod_gAAAAABm7ZDEbdCd5AsQHf0I8wm-rAz_pdIzrr7OvuGA298kQHBdCpIUZRW1NPEIzXi_uSC6apXO7dHptkv41heS0jmE94_mfsKi6v6JFQbQAcsnZITRxa1cBO6JhOvuWAj6qIopfgK_MB_5HTbpuhTbRu423YSutvtcrqJumFJeeIRcy89__G7NrJ3Td2fbkEH8rjbblVBxwT4ax14RiuFbvDLGFRAWhbSi23Zw_Wto2D8WhFUTdVwg-T215N10erG5Y0Uq5fRQ");
-  //   const merchantId = crypto.randomUUID();
-  //   const sessionData = await this.apiClient.createSession({
-  //     country: data.country || 'BR',
-  //     amount: {
-  //         currency: data.amount?.currency || 'BRL',
-  //         value: Number(data.amount?.value || 0)
-  //     },
-  //     uuidBuyer: data.idBuyer,
-  //     merchantOrderId: merchantId,
-  //     paymentDescription: data.paymentDescription || ''
-  //   });
-  //   const uuidSession = sessionData.checkoutSession
-  //   const uuidIntegration = merchantId;
-  //   const idBuyer = data.idBuyer;
-  //   const method = data.method;
-  //   yuno.startCheckout({
-  //     checkoutSession: sessionData.session,
-  //     elementSelector: "#root",
-  //     countryCode: "BR",
-  //     language: "pt",
-  //     showLoading: true,
-  //     showPaymentStatus: true,
-  //     issuersFormEnable: true,
-  //     renderMode: {
-  //         type: "element",
-  //         elementSelector: "#rootElement",
-  //     },
-  //     card: {
-  //         type: "extends",
-  //         cardSaveEnable: true,
-  //     },
-  //     onLoading: (args) => {
-  //         console.log(args);
-  //     },
 
-  //     async yunoCreatePayment(oneTimeToken) {
-  //         console.log("OTT: " + oneTimeToken);
-  //         console.log("uuidSession: " + uuidSession);
-  //         console.log("uuidIntegration: " + uuidIntegration);
-  //         console.log("uuidBuyer: " + idBuyer);
-  //         const updatedData = {
-  //           data,
-  //           oneTimeToken,
-  //           uuidSession,
-  //           uuidIntegration,
-  //           idBuyer,
-  //           method
-  //         }
-  //         await createPayment(updatedData);
-  //         yuno.continuePayment({showPaymentStatus: true});
-  //     },
-
-  //     async yunoPaymentResult(data) {
-  //         console.log("yunoPaymentResult", data);
-  //         // const a = await yuno.mountStatusPayment(uuidSession);
-  //         window.location.reload()
-  //         // console.log(a);
-  //     },
-
-  //     yunoError: (error) => {
-  //         console.log("There was an error", error);
-  //         yuno.hideLoader();
-  //     },
-  //   });
-
-  //   yuno.mountCheckoutLite({
-  //       paymentMethodType: data.method
-  //   });
-  // }
   public async start(opts: StartOptions): Promise<void> {
     const yuno = await this.ensureYunoInitialized(opts.publicKey);
-    // 1) cria sessão no seu backend
     const merchantId = crypto.randomUUID();
+    try {
+      //buyer uuid sandbox - "integrationCustomerId": "d1221e91-475b-4408-a209-6231b76797ed"
+      await this.apiClient.createBuyerYuno(opts.buyerId);
+    } catch (err) {
+
+    }
     const sessionData = await this.apiClient.createSession({
       country: opts.country ?? "BR",
       amount: {
@@ -207,7 +139,6 @@ export class BarteWallet extends WebConstructor {
     });
     const uuidSession = sessionData.checkoutSession;
     const uuidIntegration = merchantId;
-    // 2) inicia o checkout com UM seletor só
     yuno.startCheckout({
       checkoutSession: sessionData.checkoutSession,
       elementSelector: opts.element,
@@ -219,7 +150,6 @@ export class BarteWallet extends WebConstructor {
       renderMode: { type: "element", elementSelector: opts.element },
       card: { type: "extends", cardSaveEnable: true },
       onLoading: (args) => console.log(args),
-      // 3) callback de criação de pagamento
       yunoCreatePayment: async (oneTimeToken: string) => {
         try {
           await this.createPaymentOrder(
@@ -247,8 +177,5 @@ export class BarteWallet extends WebConstructor {
         yuno.hideLoader();
       },
     });
-
-    // ⚠️ Use OU startCheckout OU mountCheckoutLite — evite ambos.
-    // yuno.mountCheckoutLite({ paymentMethodType: opts.method });
   }
 }

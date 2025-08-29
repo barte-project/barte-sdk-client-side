@@ -1,4 +1,4 @@
-import { OrderData, SessionData } from "./types";
+import { SessionData } from "./types";
 
 class ApiClient {
   private apiKey: string;
@@ -29,37 +29,11 @@ class ApiClient {
     }
     return response.json();
   }
-  // /buyer/yuno/0f8fccf8-a4d9-4688-97f7-4340b4a02d02
   async createBuyerYuno(barteBuyerUuid: string): Promise<any> {
     return this.request(`/v1/buyer/yuno/${barteBuyerUuid}`, "POST");
   }
-  //https://dev-bff.barte.com/service/payment/v1/session
   async createSession(sessionData: SessionData): Promise<any> {
     return this.request("/service/payment/v1/session", "POST", sessionData);
-  }
-  //https://dev-bff.barte.com/service/payment/v1/orders
-  async createOrder(orderData: OrderData): Promise<any> {
-    return this.request("/service/payment/v1/orders", "POST", orderData);
-  }
-
-  async createPayment(
-    data: any,
-    env: string,
-    oneTimeToken: string,
-    uuidSession: string,
-    uuidIntegration: string,
-    idBuyer: string,
-    method: string
-  ): Promise<any> {
-    return this.request("/service/payment/v1/payments", "POST", {
-      data,
-      env,
-      oneTimeToken,
-      uuidSession,
-      uuidIntegration,
-      idBuyer,
-      method,
-    });
   }
 }
 
