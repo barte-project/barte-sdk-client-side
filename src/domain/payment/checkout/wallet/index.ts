@@ -1,9 +1,9 @@
-import { WebConstructor } from "../../web-constructor";
+import { WebConstructor } from "../../../web-constructor";
 import { loadScript } from "@yuno-payments/sdk-web";
 import ApiClient from "./api";
 import { YunoInstance } from "@yuno-payments/sdk-web-types";
-import { BarteErrorProps, BarteSDKConstructorProps } from "../../../types";
-import { EnvironmentType, getEnv } from "../../../config/env";
+import { BarteErrorProps, BarteSDKConstructorProps } from "../../../../types";
+import { EnvironmentType, getEnv } from "../../../../config/env";
 
 interface Amount {
   currency: "BRL" | string;
@@ -60,8 +60,8 @@ export class BarteWallet extends WebConstructor {
     if (typeof v === "number") return v;
     return Number(String(v).replace(/\./g, "").replace(",", "."));
   }
-  private isBarteDuplicatedCustomerError(err: BarteErrorProps): boolean {
-    return err?.response?.data?.errors?.[0]?.code === "BAR-1801";
+  private isBarteDuplicatedCustomerError(response: BarteErrorProps): boolean {
+    return response?.errors?.[0]?.code === "BAR-1801";
   }
   private async ensureYunoInitialized(publicKey: string): Promise<YunoInstance> {
     if (this.yuno) return this.yuno; 
@@ -112,14 +112,16 @@ export class BarteWallet extends WebConstructor {
     };
   }
 
-  public async start(data: PaymentOptions): Promise<void> {
+  public async initialize(data: PaymentOptions): Promise<void> {
     const yuno = await this.ensureYunoInitialized(getEnv(this.environment).yunoKey);
     const merchantId = crypto.randomUUID();
     try {
-      await this.apiClient.createBuyerYuno(data.buyerId);
+      const response = await this.apiClient.createBuyerYuno(data.buyerId);
+      if(!this.isBarteDuplicatedCustomerError(response)) {
+        throw new Error(`Error ${response.errors[0].code}: ${response.errors[0].description} - ${response.errors[0].additionalInfo.customMessage}`);
+      }
     } catch (err) {
-      // const error = err as BarteErrorProps;
-      // if (!this.isBarteDuplicatedCustomerError(error)) throw error;
+      throw err;
     }
     const sessionData = await this.apiClient.createSession({
       country: data.country ?? "BR",

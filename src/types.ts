@@ -6,20 +6,16 @@ export type BarteSDKConstructorProps = {
 };
 
 export type BarteErrorProps =  {
-  response?: {
-    data?: {
-      errors?: Array<{
-        code: string;
-        title?: string;
-        description?: string;
-        additionalInfo?: {
-          type?: string;
-          declinedCode?: string;
-          customMessage?: string;
-        };
-      }>;
+  errors?: Array<{
+    code: string;
+    title?: string;
+    description?: string;
+    additionalInfo?: {
+      type?: string;
+      declinedCode?: string;
+      customMessage?: string;
     };
-  };
+  }>;
   message?: string;
   stack?: string;
 }

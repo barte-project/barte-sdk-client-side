@@ -1,6 +1,6 @@
 import type { BarteSDKConstructorProps } from "../types";
 import { BarteFingerprint } from "./antifraud/fingerprint";
-import { BarteWallet } from "./payment/checkout";
+import { BarteWallet } from "./payment/checkout/wallet";
 import { BarteToken } from "./payment/token/index";
 import { WebConstructor } from "./web-constructor";
 
@@ -54,7 +54,9 @@ export class BarteSDK extends WebConstructor {
   public get payment() {
     return {
       card: this.getCardInstance(),
-      checkout: this.getBarteWallet(),
+      checkout: {
+        wallet: this.getBarteWallet()
+      },
     };
   }
 

@@ -1,5 +1,5 @@
-import { getEnv } from "../../../config/env";
-import { BarteSDKConstructorProps } from "../../../types";
+import { getEnv } from "../../../../config/env";
+import { BarteSDKConstructorProps } from "../../../../types";
 import { PaymentOrderData, ServiceOptions, SessionData } from "./types";
 
 class ApiClient {
@@ -35,10 +35,7 @@ class ApiClient {
       body: body ? JSON.stringify(body) : null,
     };
     const response = await fetch(getUrl(service), options);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
+    return await response.json();
   }
   async createBuyerYuno(barteBuyerUuid: string): Promise<any> {
     return this.request(`v1/buyer/yuno/${barteBuyerUuid}`, "POST");
