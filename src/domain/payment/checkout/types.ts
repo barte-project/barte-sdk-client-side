@@ -103,3 +103,5 @@ export type YunoPaymentData = {
   metadata: any;
   uuidBuyer: string;
 };
+
+export type ServiceOptions = "monolict" | "payment";

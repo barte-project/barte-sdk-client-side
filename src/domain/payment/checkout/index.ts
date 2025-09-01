@@ -18,11 +18,11 @@ interface PaymentOptions {
   method: "GOOGLE_PAY" | "APPLE_PAY"; 
   paymentDescription?: string;
   //Payment Order Props
-  startDate: string;
+  startDate: string; // Ex: yyyy-MM-dd
   internationalDocument: {
     documentNumber: string;
-    documentType: string;
-    documentNation: string;
+    documentType: string; // Ex: CPF
+    documentNation: string; // Ex: BR
   };
   name: string;
   email: string;
@@ -43,7 +43,7 @@ export class BarteWallet extends WebConstructor {
   private yuno?: YunoInstance;
   constructor({ accessToken, environment }: BarteSDKConstructorProps) {
     super({ accessToken, environment });
-    this.apiClient = new ApiClient(accessToken);
+    this.apiClient = new ApiClient({accessToken, environment});
   }
   private formatEnvironment(environment: EnvironmentType) {
     const formattedEnvironment = {
@@ -108,36 +108,6 @@ export class BarteWallet extends WebConstructor {
       metadata: [{ key: "Version", value: "1" }],
       uuidBuyer: data.buyerId,
     };
-  }
-
-  private async createPaymentOrder(
-    data: PaymentOptions,
-    oneTimeToken: string,
-    uuidSession: string,
-    uuidIntegration: string
-  ) {
-    const url = "https://sandbox-bff.barte.com/service/payment/v1/orders";
-    const headers = {
-      "X-Token-Api": this.accessToken,
-      "Content-Type": "application/json",
-      "x-idempotency-key": crypto.randomUUID(),
-    };
-    const body = this.buildPaymentPayload(
-      data,
-      oneTimeToken,
-      uuidSession,
-      uuidIntegration
-    );
-    const res = await fetch(url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Erro ao criar order: ${res.status} ${text}`);
-    }
-    return res.json();
   }
 
   public async start(data: PaymentOptions): Promise<void> {

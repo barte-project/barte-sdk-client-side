@@ -1,29 +1,40 @@
-import { PaymentOrderData, SessionData } from "./types";
+import { getEnv } from "../../../config/env";
+import { BarteSDKConstructorProps } from "../../../types";
+import { PaymentOrderData, ServiceOptions, SessionData } from "./types";
 
 class ApiClient {
-  private apiKey: string;
-  private baseUrl: string;
+  private accessToken: string;
+  private monolictUrl: string;
+  private paymentUrl: string;
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    this.baseUrl = "https://sandbox-bff.barte.com";
+  constructor({ accessToken, environment = "production" }: BarteSDKConstructorProps) {
+    this.accessToken = accessToken;
+    this.monolictUrl = getEnv(environment).monolictUrl;
+    this.paymentUrl = getEnv(environment).paymentUrl;
   }
   async request(
     endpoint: string,
     method: string = "GET",
-    body: any = null
+    body: any = null,
+    service: ServiceOptions = "monolict"
   ): Promise<any> {
-    const url = `${this.baseUrl}${endpoint}`;
+    const getUrl = (service: ServiceOptions) => {
+      const urls = {
+        monolict : `${this.monolictUrl}${endpoint}`,
+        payment : `${this.paymentUrl}${endpoint}`
+      }
+      return urls[service];
+    }
     const headers = {
       "Content-Type": "application/json",
-      "X-Token-Api": this.apiKey,
+      "X-Token-Sdk": this.accessToken,
     };
     const options = {
       method,
       headers,
       body: body ? JSON.stringify(body) : null,
     };
-    const response = await fetch(url, options);
+    const response = await fetch(getUrl(service), options);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -33,10 +44,10 @@ class ApiClient {
     return this.request(`/service/core/v1/buyer/yuno/${barteBuyerUuid}`, "POST");
   }
   async createSession(sessionData: SessionData): Promise<any> {
-    return this.request("/service/payment/v1/session", "POST", sessionData);
+    return this.request("/service/payment/v1/session", "POST", sessionData, "payment");
   }
   async createPaymentOrder(paymentOrderData: PaymentOrderData): Promise<any> {
-    return this.request("/service/payment/v1/orders", "POST", paymentOrderData);
+    return this.request("/service/payment/v1/orders", "POST", paymentOrderData, "payment");
   }
 }
 
