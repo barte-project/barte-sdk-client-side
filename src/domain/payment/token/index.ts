@@ -2,7 +2,6 @@ import { createIframe } from "./iframe";
 import { WebConstructor } from "../../web-constructor";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
-import { getEnv } from "../../../config/env";
 import { BarteSDKConstructorProps } from "../../../types";
 
 export class BarteToken extends WebConstructor {
@@ -32,13 +31,12 @@ export class BarteToken extends WebConstructor {
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Formato de CVV inválido");
 
-    const iframe = await createIframe(this.environment);
+    const iframe = await createIframe();
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
         window.removeEventListener("message", listener);
 
-        // isso só vale em casos em que há um error no body, validar para o cenário em que está o status 401
         if (!message.data.error) {
           const messageData = message.data;
 
@@ -66,7 +64,7 @@ export class BarteToken extends WebConstructor {
             environment: this.environment,
           },
         },
-        getEnv(this.environment).iframeScriptUrl
+        Env.SDK_IFRAME_URL
       );
     });
   }
