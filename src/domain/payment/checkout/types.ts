@@ -9,7 +9,7 @@ export type SessionData = {
   paymentDescription: string;
 };
 
-export type OrderData = {
+export type PaymentOrderData = {
   startDate: string;
   value: number;
   installments: number;

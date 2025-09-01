@@ -3,23 +3,41 @@ import { loadScript } from "@yuno-payments/sdk-web";
 import ApiClient from "./api";
 import { YunoInstance } from "@yuno-payments/sdk-web-types";
 import { BarteErrorProps, BarteSDKConstructorProps } from "../../../types";
-import { getEnv } from "../../../config/env";
-// import { isBarteDuplicatedCustomerError } from "../../../utils";
+import { EnvironmentType, getEnv } from "../../../config/env";
 
 interface Amount {
   currency: "BRL" | string;
   value: number;
 }
-interface StartOptions {
+interface PaymentOptions {
   element: string; // Ex: "#root"
-  country?: string; // default "BR"
+  country?: string;
   language?: "pt" | "en" | "es"; 
   buyerId: string;
   amount: Amount;
-  method: string;
+  method: "GOOGLE_PAY" | "APPLE_PAY"; 
   paymentDescription?: string;
-  apiToken: string;
+  //Payment Order Props
+  startDate: string;
+  internationalDocument: {
+    documentNumber: string;
+    documentType: string;
+    documentNation: string;
+  };
+  name: string;
+  email: string;
+  phone: string;
+  billingAddress: {
+    country: string,
+    state: string,
+    city: string,
+    district: string,
+    street: string,
+    zipCode: string,
+  }
 }
+type YunoEnvironmentOptions = "dev" | "prod" | "sandbox" | "staging";
+
 export class BarteWallet extends WebConstructor {
   private apiClient: ApiClient;
   private yuno?: YunoInstance;
@@ -27,12 +45,14 @@ export class BarteWallet extends WebConstructor {
     super({ accessToken, environment });
     this.apiClient = new ApiClient(accessToken);
   }
-  private actualDate(): string {
-    const d = new Date();
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
+  private formatEnvironment(environment: EnvironmentType) {
+    const formattedEnvironment = {
+      local: "dev",
+      dev: "staging",
+      production: "prod",
+      sandbox: "sandbox",
+    }
+    return formattedEnvironment[environment] as YunoEnvironmentOptions;
   }
   private parseAmountValue(v: number | string): number {
     if (typeof v === "number") return v;
@@ -43,24 +63,24 @@ export class BarteWallet extends WebConstructor {
   }
   private async ensureYunoInitialized(publicKey: string): Promise<YunoInstance> {
     if (this.yuno) return this.yuno; 
-    const { initialize }  = await loadScript({ env: getEnv(this.environment) });
+    const { initialize }  = await loadScript({ env: this.formatEnvironment(this.environment) });
     this.yuno = await initialize(publicKey); 
     return this.yuno;
   }
 
   private buildPaymentPayload(
-    opts: StartOptions,
+    data: PaymentOptions,
     oneTimeToken: string,
     uuidSession: string,
     uuidIntegration: string
   ) {
     return {
-      startDate: this.actualDate(),
-      value: this.parseAmountValue(opts.amount.value),
+      startDate: data.startDate,
+      value: this.parseAmountValue(data.amount.value),
       installments: 1,
-      title: opts.paymentDescription || "Order",
+      title: data.paymentDescription || "Wallet Order",
       payment: {
-        method: opts.method,
+        method: data.method,
         wallet: {
           oneTimeToken,
           checkoutSessionUuid: uuidSession,
@@ -68,42 +88,42 @@ export class BarteWallet extends WebConstructor {
         },
         fraudData: {
           internationalDocument: {
-            documentNumber: "65606587084",
-            documentType: "CPF",
-            documentNation: "BR",
+            documentNumber: data.internationalDocument.documentNumber,
+            documentType: data.internationalDocument.documentType,
+            documentNation: data.internationalDocument.documentNation,
           },
-          name: `Wallet ${opts.amount.value}`,
-          email: `wallet_${opts.amount.value}@email.com`,
-          phone: "34992991234",
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
           billingAddress: {
-            country: "BR",
-            state: "MG",
-            city: "Uberlandia",
-            district: "Centro",
-            street: "Rua Teste",
-            zipCode: "38401999",
+            country: data.billingAddress.country,
+            state: data.billingAddress.state,
+            city: data.billingAddress.city,
+            district: data.billingAddress.district,
+            street: data.billingAddress.street,
+            zipCode: data.billingAddress.zipCode,
           },
         },
       },
       metadata: [{ key: "Version", value: "1" }],
-      uuidBuyer: opts.buyerId,
+      uuidBuyer: data.buyerId,
     };
   }
 
   private async createPaymentOrder(
-    opts: StartOptions,
+    data: PaymentOptions,
     oneTimeToken: string,
     uuidSession: string,
     uuidIntegration: string
   ) {
     const url = "https://sandbox-bff.barte.com/service/payment/v1/orders";
     const headers = {
-      "X-Token-Api": opts.apiToken,
+      "X-Token-Api": this.accessToken,
       "Content-Type": "application/json",
       "x-idempotency-key": crypto.randomUUID(),
     };
     const body = this.buildPaymentPayload(
-      opts,
+      data,
       oneTimeToken,
       uuidSession,
       uuidIntegration
@@ -120,63 +140,53 @@ export class BarteWallet extends WebConstructor {
     return res.json();
   }
 
-  public async start(opts: StartOptions): Promise<void> {
+  public async start(data: PaymentOptions): Promise<void> {
     const yuno = await this.ensureYunoInitialized(getEnv(this.environment).yunoKey);
-    console.log("oi", yuno)
     const merchantId = crypto.randomUUID();
     try {
-      //buyer uuid sandbox - "integrationCustomerId": "d1221e91-475b-4408-a209-6231b76797ed"
-      await this.apiClient.createBuyerYuno(opts.buyerId);
+      await this.apiClient.createBuyerYuno(data.buyerId);
     } catch (err) {
       const error = err as BarteErrorProps;
       if (!this.isBarteDuplicatedCustomerError(error)) throw error;
     }
-    // try {
-    //   const sessionData = await this.apiClient.createSession({
-    //     country: opts.country ?? "BR",
-    //     amount: {
-    //       currency: opts?.amount?.currency ?? "BRL",
-    //       value: this.parseAmountValue(opts.amount.value),
-    //     },
-    //     uuidBuyer: opts.buyerId,
-    //     merchantOrderId: merchantId,
-    //     paymentDescription: opts.paymentDescription || "",
-    //   });
-    // } catch (err) {
-
-    // }
-
-
-    // const uuidSession = sessionData.checkoutSession;
-    const uuidSession = "62353722-ee2e-4991-b899-36613577935b";
+    const sessionData = await this.apiClient.createSession({
+      country: data.country ?? "BR",
+      amount: {
+        currency: data.amount?.currency ?? "BRL",
+        value: this.parseAmountValue(data.amount.value),
+      },
+      uuidBuyer: data.buyerId,
+      merchantOrderId: merchantId,
+      paymentDescription: data.paymentDescription || "",
+    });
+    const uuidSession = sessionData.checkoutSession;
     const uuidIntegration = merchantId;
-
     yuno.startCheckout({
-      checkoutSession: "62353722-ee2e-4991-b899-36613577935b",
-      elementSelector: "#root",
-      countryCode: opts.country ?? "BR",
-      language: opts.language ?? "pt",
+      checkoutSession: uuidSession,
+      elementSelector: data.element,
+      countryCode: data.country ?? "BR",
+      language: data.language ?? "pt",
       showLoading: true,
       showPaymentStatus: true,
       issuersFormEnable: true,
-      renderMode: { type: "element", elementSelector: "#root" },
+      renderMode: { type: "element", elementSelector: data.element },
       card: { type: "extends", cardSaveEnable: true },
       onLoading: (args) => console.log(args),
       yunoCreatePayment: async (oneTimeToken: string) => {
         try {
-          await this.createPaymentOrder(
-            opts,
+          const body = this.buildPaymentPayload(
+            data,
             oneTimeToken,
             uuidSession,
             uuidIntegration
           );
+          await this.apiClient.createPaymentOrder(body);
           await yuno.continuePayment({ showPaymentStatus: true });
         } catch (err) {
           console.error("Erro ao criar pagamento:", err);
           yuno.hideLoader();
         }
       },
-      // 4) resultado do pagamento
       yunoPaymentResult: async (result: unknown) => {
         console.log("yunoPaymentResult", result);
         window.location.reload();
@@ -187,7 +197,7 @@ export class BarteWallet extends WebConstructor {
       },
     });
     yuno.mountCheckoutLite({
-      paymentMethodType: 
+      paymentMethodType: data.method
     });
   }
 }

@@ -1,4 +1,4 @@
-import { SessionData } from "./types";
+import { PaymentOrderData, SessionData } from "./types";
 
 class ApiClient {
   private apiKey: string;
@@ -32,9 +32,11 @@ class ApiClient {
   async createBuyerYuno(barteBuyerUuid: string): Promise<any> {
     return this.request(`/service/core/v1/buyer/yuno/${barteBuyerUuid}`, "POST");
   }
-  //https://sandbox-bff.barte.com/service/payment/v1/session
   async createSession(sessionData: SessionData): Promise<any> {
     return this.request("/service/payment/v1/session", "POST", sessionData);
+  }
+  async createPaymentOrder(paymentOrderData: PaymentOrderData): Promise<any> {
+    return this.request("/service/payment/v1/orders", "POST", paymentOrderData);
   }
 }
 
