@@ -3,7 +3,7 @@ const { execSync } = require("child_process");
 const path = require("path");
 const fs = require("fs")
 
-const environments = ["dev", "sandbox", "hml", "production"]
+const environments = ["local", "dev", "sandbox", "hml", "production"]
 
 const { ENV } = process.env
 
@@ -12,6 +12,10 @@ if (!ENV) throw new Error("Variável de ambiente não definida!")
 if (!environments.includes(ENV)) throw new Error(`Environment '${ENV}' inválido!`)
 
 const ENVIRONMENT_URLS = {
+    local: {
+        SDK_SCRIPT_URL: "\"http://localhost:5500/script.min.js\"",
+        SDK_IFRAME_URL: "\"http://localhost:5500/\""
+    },
     dev: {
         SDK_SCRIPT_URL: "\"https://dev-sdk-client.barte.com/script.min.js\"",
         SDK_IFRAME_URL: "\"https://dev-sdk-client.barte.com/\""
@@ -62,7 +66,7 @@ esbuild.build({
     define: ENV_OBJ
 }).catch(() => process.exit(1));
 
-const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/token/iframe.ts", "src/domain/payment/token/utils.ts", "src/domain/payment/checkout/index.ts", "src/domain/payment/checkout/wallet/api.ts","src/domain/payment/checkout/wallet/index.ts", "src/domain/payment/index.ts", "src/domain/antifraud/fingerprint/index.ts", "src/domain/antifraud/fingerprint/utils.ts", "src/domain/web-constructor.ts", "src/config/env.ts"]
+const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/token/iframe.ts", "src/domain/payment/token/utils.ts", "src/domain/payment/checkout/index.ts", "src/domain/payment/checkout/wallet/api.ts", "src/domain/payment/checkout/wallet/index.ts", "src/domain/payment/index.ts", "src/domain/antifraud/fingerprint/index.ts", "src/domain/antifraud/fingerprint/utils.ts", "src/domain/web-constructor.ts", "src/config/env.ts"]
 
 // Builda os pacotes separados com esm (para ser usado com 'import')
 esbuild.build({

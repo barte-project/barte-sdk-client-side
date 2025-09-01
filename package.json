@@ -7,6 +7,7 @@
   },
   "license": "ISC",
   "scripts": {
+    "build:local": "ENV=local node build.js",
     "build:dev": "ENV=dev node build.js",
     "build:sandbox": "ENV=sandbox node build.js",
     "build:hml": "ENV=hml node build.js",
