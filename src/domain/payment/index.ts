@@ -1,2 +1,2 @@
-export * from "./checkout/wallet/index";
+export * from "./checkout";
 export * from "./token";
