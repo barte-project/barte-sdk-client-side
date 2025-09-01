@@ -13,8 +13,8 @@ if (!environments.includes(ENV)) throw new Error(`Environment '${ENV}' inválido
 
 const ENVIRONMENT_URLS = {
     local: {
-        SDK_SCRIPT_URL: "\"http://localhost:5500/script.min.js\"",
-        SDK_IFRAME_URL: "\"http://localhost:5500/\""
+        SDK_SCRIPT_URL: "\"http://localhost:3000/dist/script.min.js\"",
+        SDK_IFRAME_URL: "\"http://localhost:3000/dist/index.html\""
     },
     dev: {
         SDK_SCRIPT_URL: "\"https://dev-sdk-client.barte.com/script.min.js\"",

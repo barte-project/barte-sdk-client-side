@@ -46,15 +46,15 @@ window.addEventListener("DOMContentLoaded", () => {
       window.parent.postMessage(result, "*");
     }
     if (eventData.type === "submitCreateBuyer") {
-      const result = await api.createBuyerYuno(eventData.data);
+      const result = await api.createBuyerYuno(eventData.data.buyerId);
       window.parent.postMessage(result, "*");
     }
     if (eventData.type === "submitCreateSession") {
-      const result = await api.createSession(eventData.data)
+      const result = await api.createSession(eventData.data.data)
       window.parent.postMessage(result, "*");
     }
     if (eventData.type === "submitCreatePayment") {
-      const result = await api.createPaymentOrder(eventData.data)
+      const result = await api.createPaymentOrder(eventData.data.data)
       window.parent.postMessage(result, "*");
     }
   });

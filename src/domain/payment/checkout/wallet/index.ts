@@ -186,7 +186,7 @@ export class BarteWallet extends WebConstructor {
     } catch (err) {
       throw err;
     }
-    const sessionData = await this.createSession({
+    const sessionData: any = await this.createSession({
       country: data.country ?? "BR",
       amount: {
         currency: data.amount?.currency ?? "BRL",
@@ -196,7 +196,7 @@ export class BarteWallet extends WebConstructor {
       merchantOrderId: merchantId,
       paymentDescription: data.paymentDescription || "",
     });
-    //@ts-ignore
+    
     const uuidSession = sessionData.checkoutSession;
     const uuidIntegration = merchantId;
     yuno.startCheckout({
