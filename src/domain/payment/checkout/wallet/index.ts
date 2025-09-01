@@ -5,7 +5,6 @@ import { YunoInstance } from "@yuno-payments/sdk-web-types";
 import { BarteErrorProps, BarteSDKConstructorProps } from "../../../../types";
 import { EnvironmentType, getEnv } from "../../../../config/env";
 import { createIframe } from "../../token/iframe";
-import { TokenizeResult } from "../../token/types";
 import { CreateSessionOptions, PaymentOptions, PaymentOrderData, YunoEnvironmentOptions } from "./types";
 
 export class BarteWallet extends WebConstructor {
