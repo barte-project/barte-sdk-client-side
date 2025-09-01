@@ -35,6 +35,8 @@ interface PaymentOptions {
     street: string,
     zipCode: string,
   }
+  successURL: string,
+  errorURL: string,
 }
 type YunoEnvironmentOptions = "dev" | "prod" | "sandbox" | "staging";
 
@@ -116,8 +118,8 @@ export class BarteWallet extends WebConstructor {
     try {
       await this.apiClient.createBuyerYuno(data.buyerId);
     } catch (err) {
-      const error = err as BarteErrorProps;
-      if (!this.isBarteDuplicatedCustomerError(error)) throw error;
+      // const error = err as BarteErrorProps;
+      // if (!this.isBarteDuplicatedCustomerError(error)) throw error;
     }
     const sessionData = await this.apiClient.createSession({
       country: data.country ?? "BR",
@@ -161,11 +163,12 @@ export class BarteWallet extends WebConstructor {
       },
       yunoPaymentResult: async (result: unknown) => {
         console.log("yunoPaymentResult", result);
-        window.location.reload();
+        window.location.replace(data.successURL);
       },
       yunoError: (error) => {
         console.error("Erro no Yuno:", error);
         yuno.hideLoader();
+        window.location.replace(data.errorURL);
       },
     });
     yuno.mountCheckoutLite({

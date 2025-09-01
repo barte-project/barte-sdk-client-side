@@ -27,7 +27,7 @@ class ApiClient {
     }
     const headers = {
       "Content-Type": "application/json",
-      "X-Token-Sdk": this.accessToken,
+      "X-Token-Api": this.accessToken,
     };
     const options = {
       method,
@@ -41,13 +41,13 @@ class ApiClient {
     return response.json();
   }
   async createBuyerYuno(barteBuyerUuid: string): Promise<any> {
-    return this.request(`/service/core/v1/buyer/yuno/${barteBuyerUuid}`, "POST");
+    return this.request(`v1/buyer/yuno/${barteBuyerUuid}`, "POST");
   }
   async createSession(sessionData: SessionData): Promise<any> {
-    return this.request("/service/payment/v1/session", "POST", sessionData, "payment");
+    return this.request("v1/session", "POST", sessionData, "payment");
   }
   async createPaymentOrder(paymentOrderData: PaymentOrderData): Promise<any> {
-    return this.request("/service/payment/v1/orders", "POST", paymentOrderData, "payment");
+    return this.request("v1/orders", "POST", paymentOrderData, "payment");
   }
 }
 
