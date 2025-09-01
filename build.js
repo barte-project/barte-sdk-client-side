@@ -3,6 +3,38 @@ const { execSync } = require("child_process");
 const path = require("path");
 const fs = require("fs")
 
+const environments = ["dev", "sandbox", "hml", "production"]
+
+const { ENV } = process.env
+
+if (!ENV) throw new Error("Variável de ambiente não definida!")
+
+if (!environments.includes(ENV)) throw new Error(`Environment '${ENV}' inválido!`)
+
+const ENVIRONMENT_URLS = {
+    dev: {
+        SDK_SCRIPT_URL: "\"https://dev-sdk-client.barte.com/script.min.js\"",
+        SDK_IFRAME_URL: "\"https://dev-sdk-client.barte.com/\""
+    },
+    sandbox: {
+        SDK_SCRIPT_URL: "\"https://sandbox-sdk-client.barte.com/script.min.js\"",
+        SDK_IFRAME_URL: "\"https://sandbox-sdk-client.barte.com/\""
+    },
+    hml: {
+        SDK_SCRIPT_URL: "\"https://hml-sdk-client.barte.com/script.min.js\"",
+        SDK_IFRAME_URL: "\"https://hml-sdk-client.barte.com/\""
+    },
+    production: {
+        SDK_SCRIPT_URL: "\"https://sdk-client.barte.com/script.min.js\"",
+        SDK_IFRAME_URL: "\"https://sdk-client.barte.com/\""
+    }
+}
+
+const ENV_OBJ = {
+    "Env.SDK_SCRIPT_URL": ENVIRONMENT_URLS[ENV].SDK_SCRIPT_URL,
+    "Env.SDK_IFRAME_URL": ENVIRONMENT_URLS[ENV].SDK_IFRAME_URL
+}
+
 execSync("tsc --declaration --emitDeclarationOnly --outDir dist")
 
 // Faz o bundle para uso em browser e por import
@@ -14,6 +46,7 @@ esbuild.build({
     outfile: "dist/script.min.js",
     format: "iife", // Imediatamente executado no browser
     target: ["esnext"],
+    define: ENV_OBJ
 }).catch(() => process.exit(1));
 
 // Faz o bundle para uso em browser e por import
@@ -26,6 +59,7 @@ esbuild.build({
     format: "iife", // Imediatamente executado no browser
     globalName: "BarteSdk", // Exposto como window.BarteSdk
     target: ["esnext"],
+    define: ENV_OBJ
 }).catch(() => process.exit(1));
 
 const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/token/iframe.ts", "src/domain/payment/token/utils.ts", "src/domain/payment/checkout/index.ts", "src/domain/payment/checkout/api.ts", "src/domain/payment/index.ts", "src/domain/antifraud/fingerprint/index.ts", "src/domain/antifraud/fingerprint/utils.ts", "src/domain/web-constructor.ts", "src/config/env.ts"]
@@ -40,6 +74,7 @@ esbuild.build({
     target: ['esnext'],
     sourcemap: true,
     outbase: 'src',
+    define: ENV_OBJ
 }).catch(() => process.exit(1));
 
 /**
@@ -53,6 +88,7 @@ esbuild.build({
     format: "cjs",
     outfile: "dist/cjs/index.cjs",
     target: ["esnext"],
+    define: ENV_OBJ
 }).catch(() => process.exit(1));
 
 esbuild.build({
@@ -62,6 +98,7 @@ esbuild.build({
     format: "cjs",
     outfile: "dist/cjs/domain/payment/token/index.cjs",
     target: ["esnext"],
+    define: ENV_OBJ
 }).catch(() => process.exit(1));
 
 esbuild.build({
@@ -71,6 +108,7 @@ esbuild.build({
     format: "cjs",
     outfile: "dist/cjs/domain/payment/checkout/index.cjs",
     target: ["esnext"],
+    define: ENV_OBJ
 }).catch(() => process.exit(1));
 
 esbuild.build({
@@ -80,6 +118,7 @@ esbuild.build({
     format: "cjs",
     outfile: "dist/cjs/domain/antifraud/fingerprint/index.cjs",
     target: ["esnext"],
+    define: ENV_OBJ
 }).catch(() => process.exit(1));
 
 // Copia index.html para dist/
