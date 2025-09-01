@@ -53,16 +53,18 @@ export class BarteToken extends WebConstructor {
 
       iframe.contentWindow?.postMessage(
         {
-          type: "submitForm",
+          type: "submitTokenForm",
           data: {
             holderName: cardHolderName.trim(),
             cvv: cardCVV,
             expiration: cardExpiryDate,
             number: cardNumber,
             buyerUuid,
+          },
+          config: {
             accessToken: this.accessToken,
             environment: this.environment,
-          },
+          }
         },
         Env.SDK_IFRAME_URL
       );

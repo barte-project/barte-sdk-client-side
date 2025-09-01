@@ -6,7 +6,6 @@ class ApiClient {
   private accessToken: string;
   private monolictUrl: string;
   private paymentUrl: string;
-
   constructor({ accessToken, environment = "production" }: BarteSDKConstructorProps) {
     this.accessToken = accessToken;
     this.monolictUrl = getEnv(environment).monolictUrl;
@@ -27,7 +26,7 @@ class ApiClient {
     }
     const headers = {
       "Content-Type": "application/json",
-      "X-Token-Api": this.accessToken,
+      "X-Token-Sdk": this.accessToken,
     };
     const options = {
       method,

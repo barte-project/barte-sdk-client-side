@@ -4,41 +4,9 @@ import ApiClient from "./api";
 import { YunoInstance } from "@yuno-payments/sdk-web-types";
 import { BarteErrorProps, BarteSDKConstructorProps } from "../../../../types";
 import { EnvironmentType, getEnv } from "../../../../config/env";
-
-interface Amount {
-  currency: "BRL" | string;
-  value: number;
-}
-interface PaymentOptions {
-  element: string; // Ex: "#root"
-  country?: string;
-  language?: "pt" | "en" | "es"; 
-  buyerId: string;
-  amount: Amount;
-  method: "GOOGLE_PAY" | "APPLE_PAY"; 
-  paymentDescription?: string;
-  //Payment Order Props
-  startDate: string; // Ex: yyyy-MM-dd
-  internationalDocument: {
-    documentNumber: string;
-    documentType: string; // Ex: CPF
-    documentNation: string; // Ex: BR
-  };
-  name: string;
-  email: string;
-  phone: string;
-  billingAddress: {
-    country: string,
-    state: string,
-    city: string,
-    district: string,
-    street: string,
-    zipCode: string,
-  }
-  successURL: string,
-  errorURL: string,
-}
-type YunoEnvironmentOptions = "dev" | "prod" | "sandbox" | "staging";
+import { createIframe } from "../../token/iframe";
+import { TokenizeResult } from "../../token/types";
+import { CreateSessionOptions, PaymentOptions, PaymentOrderData, YunoEnvironmentOptions } from "./types";
 
 export class BarteWallet extends WebConstructor {
   private apiClient: ApiClient;
@@ -112,18 +80,114 @@ export class BarteWallet extends WebConstructor {
     };
   }
 
+
+  private async createBuyer(buyerId: string) {
+    const iframe = await createIframe();
+    return new Promise((resolve, reject) => {
+      const listener = (message: MessageEvent<any>) => {
+        window.removeEventListener("message", listener);
+        if(!this.isBarteDuplicatedCustomerError(message.data)) {
+          reject(new Error(`Error ${message.data.errors[0].code}: ${message.data.errors[0].description} - ${message.data.errors[0].additionalInfo.customMessage}`));
+        }
+        resolve(message.data);
+      };
+
+      window.addEventListener("message", listener);
+
+      iframe.contentWindow?.postMessage(
+        {
+          type: "submitCreateBuyer",
+          data: {
+            buyerId,
+          },
+          config: {
+            accessToken: this.accessToken,
+            environment: this.environment,
+          }
+        },
+        Env.SDK_IFRAME_URL
+      );
+    });
+  }
+  private async createSession(data: CreateSessionOptions) {
+    const iframe = await createIframe();
+    return new Promise((resolve, reject) => {
+      const listener = (message: MessageEvent<any>) => {
+        window.removeEventListener("message", listener);
+
+        if (!message.data.error) {
+          const messageData = message.data;
+          // TODO: Mapear outros cenários de erros possíveis aqui
+          if (Array.isArray(messageData.errors) && messageData.errors.length)
+            reject(messageData);
+
+          resolve(messageData);
+        }
+        reject(message.data);
+      };
+
+      window.addEventListener("message", listener);
+
+      iframe.contentWindow?.postMessage(
+        {
+          type: "submitCreateSession",
+          data: {
+            country: data.country ?? "BR",
+            amount: {
+              currency: data.amount?.currency ?? "BRL",
+              value: this.parseAmountValue(data.amount.value),
+            },
+            uuidBuyer: data.uuidBuyer,
+            merchantOrderId: data.merchantOrderId,
+            paymentDescription: data.paymentDescription || "",
+          },
+          config: {
+            accessToken: this.accessToken,
+            environment: this.environment,
+          }
+        },
+        Env.SDK_IFRAME_URL
+      );
+    });
+  }
+  private async createPaymentOrder(data: PaymentOrderData) {
+    const iframe = await createIframe();
+    return new Promise((resolve, reject) => {
+      const listener = (message: MessageEvent<any>) => {
+        window.removeEventListener("message", listener);
+        if (!message.data.error) {
+          const messageData = message.data;
+          // TODO: Mapear outros cenários de erros possíveis aqui
+          if (Array.isArray(messageData.errors) && messageData.errors.length)
+            reject(messageData);
+          resolve(messageData);
+        }
+        reject(message.data);
+      };
+      window.addEventListener("message", listener);
+      iframe.contentWindow?.postMessage(
+        {
+          type: "submitCreatePayment",
+          data,
+          config: {
+            accessToken: this.accessToken,
+            environment: this.environment,
+          }
+        },
+        Env.SDK_IFRAME_URL
+      );
+    });
+  }
+
   public async initialize(data: PaymentOptions): Promise<void> {
     const yuno = await this.ensureYunoInitialized(getEnv(this.environment).yunoKey);
     const merchantId = crypto.randomUUID();
     try {
-      const response = await this.apiClient.createBuyerYuno(data.buyerId);
-      if(!this.isBarteDuplicatedCustomerError(response)) {
-        throw new Error(`Error ${response.errors[0].code}: ${response.errors[0].description} - ${response.errors[0].additionalInfo.customMessage}`);
-      }
+      await this.createBuyer(data.buyerId);
     } catch (err) {
       throw err;
     }
-    const sessionData = await this.apiClient.createSession({
+    const sessionData = await this.createSession({
       country: data.country ?? "BR",
       amount: {
         currency: data.amount?.currency ?? "BRL",
@@ -133,6 +197,7 @@ export class BarteWallet extends WebConstructor {
       merchantOrderId: merchantId,
       paymentDescription: data.paymentDescription || "",
     });
+    //@ts-ignore
     const uuidSession = sessionData.checkoutSession;
     const uuidIntegration = merchantId;
     yuno.startCheckout({
@@ -154,7 +219,7 @@ export class BarteWallet extends WebConstructor {
             uuidSession,
             uuidIntegration
           );
-          await this.apiClient.createPaymentOrder(body);
+          await this.createPaymentOrder(body);
           await yuno.continuePayment({ 
             showPaymentStatus: true 
           });

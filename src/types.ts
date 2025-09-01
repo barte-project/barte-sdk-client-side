@@ -19,3 +19,8 @@ export type BarteErrorProps =  {
   message?: string;
   stack?: string;
 }
+
+export type configHttpProps = {
+  accessToken: string;
+  environment: EnvironmentType;
+}

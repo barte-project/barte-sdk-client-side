@@ -105,3 +105,46 @@ export type YunoPaymentData = {
 };
 
 export type ServiceOptions = "monolict" | "payment";
+
+export interface Amount {
+  currency: "BRL" | string;
+  value: number;
+}
+export interface PaymentOptions {
+  element: string; // Ex: "#root"
+  country?: string;
+  language?: "pt" | "en" | "es"; 
+  buyerId: string;
+  amount: Amount;
+  method: "GOOGLE_PAY" | "APPLE_PAY"; 
+  paymentDescription?: string;
+  //Payment Order Props
+  startDate: string; // Ex: yyyy-MM-dd
+  internationalDocument: {
+    documentNumber: string;
+    documentType: string; // Ex: CPF
+    documentNation: string; // Ex: BR
+  };
+  name: string;
+  email: string;
+  phone: string;
+  billingAddress: {
+    country: string,
+    state: string,
+    city: string,
+    district: string,
+    street: string,
+    zipCode: string,
+  }
+  successURL: string,
+  errorURL: string,
+}
+export type YunoEnvironmentOptions = "dev" | "prod" | "sandbox" | "staging";
+
+export type CreateSessionOptions = {
+  country?: string;
+  uuidBuyer: string;
+  amount: Amount;
+  paymentDescription: string;
+  merchantOrderId: string;
+}
