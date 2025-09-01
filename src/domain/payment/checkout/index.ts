@@ -151,7 +151,9 @@ export class BarteWallet extends WebConstructor {
             uuidIntegration
           );
           await this.apiClient.createPaymentOrder(body);
-          await yuno.continuePayment({ showPaymentStatus: true });
+          await yuno.continuePayment({ 
+            showPaymentStatus: true 
+          });
         } catch (err) {
           console.error("Erro ao criar pagamento:", err);
           yuno.hideLoader();
