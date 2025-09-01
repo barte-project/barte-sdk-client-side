@@ -2,26 +2,27 @@ import { WebConstructor } from "../../web-constructor";
 import { loadScript } from "@yuno-payments/sdk-web";
 import ApiClient from "./api";
 import { YunoInstance } from "@yuno-payments/sdk-web-types";
-import { BarteSDKConstructorProps } from "../../../types";
+import { BarteErrorProps, BarteSDKConstructorProps } from "../../../types";
+import { getEnv } from "../../../config/env";
+// import { isBarteDuplicatedCustomerError } from "../../../utils";
+
 interface Amount {
   currency: "BRL" | string;
   value: number;
 }
 interface StartOptions {
   element: string; // Ex: "#root"
-  publicKey: string; // NÃO hardcode no fonte
   country?: string; // default "BR"
-  language?: "pt" | "en" | "es"; // default "pt"
+  language?: "pt" | "en" | "es"; 
   buyerId: string;
   amount: Amount;
-  method: string; // ex: "WALLET"
+  method: string;
   paymentDescription?: string;
-  apiToken: string; // para seu backend (orders)
+  apiToken: string;
 }
 export class BarteWallet extends WebConstructor {
   private apiClient: ApiClient;
   private yuno?: YunoInstance;
-  // https://sandbox-bff.barte.com/service/payment/v1/session
   constructor({ accessToken, environment }: BarteSDKConstructorProps) {
     super({ accessToken, environment });
     this.apiClient = new ApiClient(accessToken);
@@ -37,15 +38,16 @@ export class BarteWallet extends WebConstructor {
     if (typeof v === "number") return v;
     return Number(String(v).replace(/\./g, "").replace(",", "."));
   }
-
-  private async ensureYunoInitialized(
-    publicKey: string
-  ): Promise<YunoInstance> {
-    if (this.yuno) return this.yuno;
-    const sdk = await loadScript();
-    this.yuno = await sdk.initialize(publicKey);
+  private isBarteDuplicatedCustomerError(err: BarteErrorProps): boolean {
+    return err?.response?.data?.errors?.[0]?.code === "BAR-1801";
+  }
+  private async ensureYunoInitialized(publicKey: string): Promise<YunoInstance> {
+    if (this.yuno) return this.yuno; 
+    const { initialize }  = await loadScript({ env: getEnv(this.environment) });
+    this.yuno = await initialize(publicKey); 
     return this.yuno;
   }
+
   private buildPaymentPayload(
     opts: StartOptions,
     oneTimeToken: string,
@@ -55,7 +57,7 @@ export class BarteWallet extends WebConstructor {
     return {
       startDate: this.actualDate(),
       value: this.parseAmountValue(opts.amount.value),
-      installments: 1, // ajuste conforme sua UI
+      installments: 1,
       title: opts.paymentDescription || "Order",
       payment: {
         method: opts.method,
@@ -119,35 +121,45 @@ export class BarteWallet extends WebConstructor {
   }
 
   public async start(opts: StartOptions): Promise<void> {
-    const yuno = await this.ensureYunoInitialized(opts.publicKey);
+    const yuno = await this.ensureYunoInitialized(getEnv(this.environment).yunoKey);
+    console.log("oi", yuno)
     const merchantId = crypto.randomUUID();
     try {
       //buyer uuid sandbox - "integrationCustomerId": "d1221e91-475b-4408-a209-6231b76797ed"
       await this.apiClient.createBuyerYuno(opts.buyerId);
     } catch (err) {
-
+      const error = err as BarteErrorProps;
+      if (!this.isBarteDuplicatedCustomerError(error)) throw error;
     }
-    const sessionData = await this.apiClient.createSession({
-      country: opts.country ?? "BR",
-      amount: {
-        currency: opts.amount.currency || "BRL",
-        value: this.parseAmountValue(opts.amount.value),
-      },
-      uuidBuyer: opts.buyerId,
-      merchantOrderId: merchantId,
-      paymentDescription: opts.paymentDescription || "",
-    });
-    const uuidSession = sessionData.checkoutSession;
+    // try {
+    //   const sessionData = await this.apiClient.createSession({
+    //     country: opts.country ?? "BR",
+    //     amount: {
+    //       currency: opts?.amount?.currency ?? "BRL",
+    //       value: this.parseAmountValue(opts.amount.value),
+    //     },
+    //     uuidBuyer: opts.buyerId,
+    //     merchantOrderId: merchantId,
+    //     paymentDescription: opts.paymentDescription || "",
+    //   });
+    // } catch (err) {
+
+    // }
+
+
+    // const uuidSession = sessionData.checkoutSession;
+    const uuidSession = "62353722-ee2e-4991-b899-36613577935b";
     const uuidIntegration = merchantId;
+
     yuno.startCheckout({
-      checkoutSession: sessionData.checkoutSession,
-      elementSelector: opts.element,
+      checkoutSession: "62353722-ee2e-4991-b899-36613577935b",
+      elementSelector: "#root",
       countryCode: opts.country ?? "BR",
       language: opts.language ?? "pt",
       showLoading: true,
       showPaymentStatus: true,
       issuersFormEnable: true,
-      renderMode: { type: "element", elementSelector: opts.element },
+      renderMode: { type: "element", elementSelector: "#root" },
       card: { type: "extends", cardSaveEnable: true },
       onLoading: (args) => console.log(args),
       yunoCreatePayment: async (oneTimeToken: string) => {
@@ -167,15 +179,15 @@ export class BarteWallet extends WebConstructor {
       // 4) resultado do pagamento
       yunoPaymentResult: async (result: unknown) => {
         console.log("yunoPaymentResult", result);
-        // opcional: consultar status
-        // const status = await yuno.mountStatusPayment(uuidSession);
         window.location.reload();
       },
-
       yunoError: (error) => {
         console.error("Erro no Yuno:", error);
         yuno.hideLoader();
       },
+    });
+    yuno.mountCheckoutLite({
+      paymentMethodType: 
     });
   }
 }

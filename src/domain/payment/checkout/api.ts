@@ -30,8 +30,9 @@ class ApiClient {
     return response.json();
   }
   async createBuyerYuno(barteBuyerUuid: string): Promise<any> {
-    return this.request(`/v1/buyer/yuno/${barteBuyerUuid}`, "POST");
+    return this.request(`/service/core/v1/buyer/yuno/${barteBuyerUuid}`, "POST");
   }
+  //https://sandbox-bff.barte.com/service/payment/v1/session
   async createSession(sessionData: SessionData): Promise<any> {
     return this.request("/service/payment/v1/session", "POST", sessionData);
   }
