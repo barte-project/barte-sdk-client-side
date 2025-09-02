@@ -1,39 +1,50 @@
-import { WebConstructor } from "../../../web-constructor";
 import { loadScript } from "@yuno-payments/sdk-web";
-import ApiClient from "./api";
 import { YunoInstance } from "@yuno-payments/sdk-web-types";
-import { BarteErrorProps, BarteSDKConstructorProps } from "../../../../types";
 import { EnvironmentType, getEnv } from "../../../../config/env";
+import { BarteErrorProps, BarteSDKConstructorProps } from "../../../../types";
+import { WebConstructor } from "../../../web-constructor";
 import { createIframe } from "../../token/iframe";
-import { CreateSessionOptions, PaymentOptions, PaymentOrderData, YunoEnvironmentOptions } from "./types";
+import {
+  CreateSessionOptions,
+  PaymentOptions,
+  PaymentOrderData,
+  YunoEnvironmentOptions,
+} from "./types";
 
 export class BarteWallet extends WebConstructor {
-  private apiClient: ApiClient;
   private yuno?: YunoInstance;
+
   constructor({ accessToken, environment }: BarteSDKConstructorProps) {
     super({ accessToken, environment });
-    this.apiClient = new ApiClient({accessToken, environment});
   }
+
   private formatEnvironment(environment: EnvironmentType) {
     const formattedEnvironment = {
       local: "dev",
       dev: "staging",
       production: "prod",
       sandbox: "sandbox",
-    }
+    };
     return formattedEnvironment[environment] as YunoEnvironmentOptions;
   }
+
   private parseAmountValue(v: number | string): number {
     if (typeof v === "number") return v;
     return Number(String(v).replace(/\./g, "").replace(",", "."));
   }
+
   private isBarteDuplicatedCustomerError(response: BarteErrorProps): boolean {
     return response?.errors?.[0]?.code === "BAR-1801";
   }
-  private async ensureYunoInitialized(publicKey: string): Promise<YunoInstance> {
-    if (this.yuno) return this.yuno; 
-    const { initialize }  = await loadScript({ env: this.formatEnvironment(this.environment) });
-    this.yuno = await initialize(publicKey); 
+
+  private async ensureYunoInitialized(
+    publicKey: string
+  ): Promise<YunoInstance> {
+    if (this.yuno) return this.yuno;
+    const { initialize } = await loadScript({
+      env: this.formatEnvironment(this.environment),
+    });
+    this.yuno = await initialize(publicKey);
     return this.yuno;
   }
 
@@ -79,14 +90,17 @@ export class BarteWallet extends WebConstructor {
     };
   }
 
-
   private async createBuyer(buyerId: string) {
     const iframe = await createIframe();
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
         window.removeEventListener("message", listener);
-        if(!this.isBarteDuplicatedCustomerError(message.data)) {
-          reject(new Error(`Error ${message.data.errors[0].code}: ${message.data.errors[0].description} - ${message.data.errors[0].additionalInfo.customMessage}`));
+        if (!this.isBarteDuplicatedCustomerError(message.data)) {
+          reject(
+            new Error(
+              `Error ${message.data.errors[0].code}: ${message.data.errors[0].description} - ${message.data.errors[0].additionalInfo.customMessage}`
+            )
+          );
         }
         resolve(message.data);
       };
@@ -102,7 +116,7 @@ export class BarteWallet extends WebConstructor {
           config: {
             accessToken: this.accessToken,
             environment: this.environment,
-          }
+          },
         },
         Env.SDK_IFRAME_URL
       );
@@ -143,7 +157,7 @@ export class BarteWallet extends WebConstructor {
           config: {
             accessToken: this.accessToken,
             environment: this.environment,
-          }
+          },
         },
         Env.SDK_IFRAME_URL
       );
@@ -171,7 +185,7 @@ export class BarteWallet extends WebConstructor {
           config: {
             accessToken: this.accessToken,
             environment: this.environment,
-          }
+          },
         },
         Env.SDK_IFRAME_URL
       );
@@ -179,7 +193,9 @@ export class BarteWallet extends WebConstructor {
   }
 
   public async initialize(data: PaymentOptions): Promise<void> {
-    const yuno = await this.ensureYunoInitialized(getEnv(this.environment).yunoKey);
+    const yuno = await this.ensureYunoInitialized(
+      getEnv(this.environment).yunoKey
+    );
     const merchantId = crypto.randomUUID();
     try {
       await this.createBuyer(data.buyerId);
@@ -196,7 +212,7 @@ export class BarteWallet extends WebConstructor {
       merchantOrderId: merchantId,
       paymentDescription: data.paymentDescription || "",
     });
-    
+
     const uuidSession = sessionData.checkoutSession;
     const uuidIntegration = merchantId;
     yuno.startCheckout({
@@ -219,8 +235,8 @@ export class BarteWallet extends WebConstructor {
             uuidIntegration
           );
           await this.createPaymentOrder(body);
-          await yuno.continuePayment({ 
-            showPaymentStatus: true 
+          await yuno.continuePayment({
+            showPaymentStatus: true,
           });
         } catch (err) {
           console.error("Erro ao criar pagamento:", err);
@@ -238,7 +254,7 @@ export class BarteWallet extends WebConstructor {
       },
     });
     yuno.mountCheckoutLite({
-      paymentMethodType: data.method
+      paymentMethodType: data.method,
     });
   }
 }

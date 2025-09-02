@@ -113,10 +113,10 @@ export interface Amount {
 export interface PaymentOptions {
   element: string; // Ex: "#root"
   country?: string;
-  language?: "pt" | "en" | "es"; 
+  language?: "pt" | "en" | "es";
   buyerId: string;
   amount: Amount;
-  method: "GOOGLE_PAY" | "APPLE_PAY"; 
+  method: "GOOGLE_PAY" | "APPLE_PAY";
   paymentDescription?: string;
   //Payment Order Props
   startDate: string; // Ex: yyyy-MM-dd
@@ -129,15 +129,15 @@ export interface PaymentOptions {
   email: string;
   phone: string;
   billingAddress: {
-    country: string,
-    state: string,
-    city: string,
-    district: string,
-    street: string,
-    zipCode: string,
-  }
-  successURL: string,
-  errorURL: string,
+    country: string;
+    state: string;
+    city: string;
+    district: string;
+    street: string;
+    zipCode: string;
+  };
+  successURL: string;
+  errorURL: string;
 }
 export type YunoEnvironmentOptions = "dev" | "prod" | "sandbox" | "staging";
 
@@ -147,4 +147,4 @@ export type CreateSessionOptions = {
   amount: Amount;
   paymentDescription: string;
   merchantOrderId: string;
-}
+};
