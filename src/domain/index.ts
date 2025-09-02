@@ -56,9 +56,9 @@ export class BarteSDK extends WebConstructor {
       card: {
         token: this.getCardInstance(),
       },
-      checkout: {
-        wallet: this.getBarteWallet(),
-      },
+      // checkout: {
+      //   wallet: this.getBarteWallet(),
+      // },
     };
   }
 
