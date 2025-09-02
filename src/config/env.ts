@@ -34,12 +34,11 @@ const ENV: Record<EnvironmentType, Record<EnvironmentVariables, string>> = {
   },
 };
 
-export function validateInstance(env: EnvironmentType) {
-  return EnvironmentList.includes(env);
-}
+export const validateEnvironment = (env: EnvironmentType) =>
+  EnvironmentList.includes(env);
 
 export function getEnv(currentEnv: EnvironmentType) {
-  if (!validateInstance(currentEnv))
+  if (!validateEnvironment(currentEnv))
     throw new Error(
       `O ambiente '${currentEnv}' não é um ambiente válido para o SDK!`
     );
