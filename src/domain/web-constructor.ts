@@ -6,7 +6,7 @@ export abstract class WebConstructor {
   protected environment: EnvironmentType;
 
   constructor({ accessToken, environment }: BarteSDKConstructorProps) {
-    if (!window)
+    if (typeof window === "undefined")
       throw new Error(
         "O objeto 'window' não está presente! O SDK Barte deve ser usado somente no contexto do Browser!"
       );
