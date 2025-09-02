@@ -6,7 +6,10 @@ class ApiClient {
   private accessToken: string;
   private monolictUrl: string;
   private paymentUrl: string;
-  constructor({ accessToken, environment = "production" }: BarteSDKConstructorProps) {
+  constructor({
+    accessToken,
+    environment = "production",
+  }: BarteSDKConstructorProps) {
     this.accessToken = accessToken;
     this.monolictUrl = getEnv(environment).monolictUrl;
     this.paymentUrl = getEnv(environment).paymentUrl;
@@ -19,11 +22,11 @@ class ApiClient {
   ): Promise<any> {
     const getUrl = (service: ServiceOptions) => {
       const urls = {
-        monolict : `${this.monolictUrl}${endpoint}`,
-        payment : `${this.paymentUrl}${endpoint}`
-      }
+        monolict: `${this.monolictUrl}${endpoint}`,
+        payment: `${this.paymentUrl}${endpoint}`,
+      };
       return urls[service];
-    }
+    };
     const headers = {
       "Content-Type": "application/json",
       "X-Token-Api": this.accessToken,
