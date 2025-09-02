@@ -34,18 +34,6 @@
       "require": "./dist/cjs/domain/payment/token/index.cjs",
       "default": "./dist/esm/domain/payment/token/index.js"
     },
-    "./payment/checkout": {
-      "types": "./dist/types/domain/payment/checkout/index.d.ts",
-      "import": "./dist/esm/domain/payment/checkout/index.js",
-      "require": "./dist/cjs/domain/payment/checkout/index.cjs",
-      "default": "./dist/esm/domain/payment/checkout/index.js"
-    },
-    "./payment/checkout/wallet": {
-      "types": "./dist/types/domain/payment/checkout/wallet/index.d.ts",
-      "import": "./dist/esm/domain/payment/checkout/wallet/index.js",
-      "require": "./dist/cjs/domain/payment/checkout/wallet/index.cjs",
-      "default": "./dist/esm/domain/payment/checkout/wallet/index.js"
-    },
     "./payment/*": {
       "types": "./dist/types/domain/payment/*.d.ts",
       "import": "./dist/esm/domain/payment/*.js",

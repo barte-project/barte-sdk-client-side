@@ -50,11 +50,12 @@ window.addEventListener("DOMContentLoaded", () => {
       window.parent.postMessage(result, "*");
     }
     if (eventData.type === "submitCreateSession") {
-      const result = await api.createSession(eventData.data.data)
+      console.log(eventData.data)
+      const result = await api.createSession(eventData.data)
       window.parent.postMessage(result, "*");
     }
     if (eventData.type === "submitCreatePayment") {
-      const result = await api.createPaymentOrder(eventData.data.data)
+      const result = await api.createPaymentOrder(eventData.data)
       window.parent.postMessage(result, "*");
     }
   });

@@ -26,7 +26,7 @@ class ApiClient {
     }
     const headers = {
       "Content-Type": "application/json",
-      "X-Token-Sdk": this.accessToken,
+      "X-Token-Api": this.accessToken,
     };
     const options = {
       method,
