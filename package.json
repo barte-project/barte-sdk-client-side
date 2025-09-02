@@ -28,6 +28,12 @@
       "require": "./dist/cjs/index.cjs",
       "default": "./dist/esm/domain/index.js"
     },
+    "./payment": {
+      "types": "./dist/types/domain/payment/index.d.ts",
+      "import": "./dist/esm/domain/payment/index.js",
+      "require": "./dist/cjs/domain/payment/index.cjs",
+      "default": "./dist/esm/domain/payment/index.js"
+    },
     "./payment/token": {
       "types": "./dist/types/domain/payment/token/index.d.ts",
       "import": "./dist/esm/domain/payment/token/index.js",

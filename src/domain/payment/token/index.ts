@@ -4,7 +4,7 @@ import { createIframe } from "./iframe";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
 
-export class BarteToken extends WebConstructor {
+export class CardToken extends WebConstructor {
   constructor({ accessToken, environment }: BarteSDKConstructorProps) {
     super({ accessToken, environment });
   }

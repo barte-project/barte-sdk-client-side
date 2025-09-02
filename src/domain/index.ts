@@ -1,13 +1,13 @@
 import type { BarteSDKConstructorProps } from "../types";
-import { BarteFingerprint } from "./antifraud/fingerprint";
-import { BarteWallet } from "./payment/checkout/wallet";
-import { BarteToken } from "./payment/token/index";
+import { Fingerprint } from "./antifraud/fingerprint";
+// import { BarteWallet } from "./payment/checkout/wallet";
+import { CardToken } from "./payment/token/index";
 import { WebConstructor } from "./web-constructor";
 
-export class BarteSDK extends WebConstructor {
-  private cardContext: BarteToken | null = null;
-  private fingerprintContext: BarteFingerprint | null = null;
-  private walletContext: BarteWallet | null = null;
+export default class Barte extends WebConstructor {
+  private cardContext: CardToken | null = null;
+  private fingerprintContext: Fingerprint | null = null;
+  // private walletContext: BarteWallet | null = null;
 
   constructor({
     accessToken,
@@ -19,7 +19,7 @@ export class BarteSDK extends WebConstructor {
   private getCardInstance() {
     const instance =
       this.cardContext ??
-      new BarteToken({
+      new CardToken({
         accessToken: this.accessToken,
         environment: this.environment,
       });
@@ -30,7 +30,7 @@ export class BarteSDK extends WebConstructor {
   private getFingerprintInstance() {
     const instance =
       this.fingerprintContext ??
-      new BarteFingerprint({
+      new Fingerprint({
         accessToken: this.accessToken,
         environment: this.environment,
       });
@@ -40,16 +40,16 @@ export class BarteSDK extends WebConstructor {
     return instance;
   }
 
-  private getBarteWallet() {
-    const instance =
-      this.walletContext ??
-      new BarteWallet({
-        accessToken: this.accessToken,
-        environment: this.environment,
-      });
-    if (!this.walletContext) this.walletContext = instance;
-    return instance;
-  }
+  // private getBarteWallet() {
+  //   const instance =
+  //     this.walletContext ??
+  //     new BarteWallet({
+  //       accessToken: this.accessToken,
+  //       environment: this.environment,
+  //     });
+  //   if (!this.walletContext) this.walletContext = instance;
+  //   return instance;
+  // }
 
   public get payment() {
     return {
@@ -69,4 +69,6 @@ export class BarteSDK extends WebConstructor {
   }
 }
 
-(window as any).BarteSDK = BarteSDK;
+export { Barte };
+
+(window as any).Barte = Barte;

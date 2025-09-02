@@ -66,7 +66,20 @@ esbuild.build({
     define: ENV_OBJ
 }).catch(() => process.exit(1));
 
-const entryPoints = ["src/domain/index.ts", "src/domain/payment/token/index.ts", "src/domain/payment/token/iframe.ts", "src/domain/payment/token/utils.ts", "src/domain/payment/checkout/index.ts", "src/domain/payment/checkout/wallet/api.ts", "src/domain/payment/checkout/wallet/index.ts", "src/domain/payment/index.ts", "src/domain/antifraud/fingerprint/index.ts", "src/domain/antifraud/fingerprint/utils.ts", "src/domain/web-constructor.ts", "src/config/env.ts"]
+const entryPoints = [
+    "src/domain/index.ts",
+    "src/domain/payment/token/index.ts",
+    "src/domain/payment/token/iframe.ts",
+    "src/domain/payment/token/utils.ts",
+    // "src/domain/payment/checkout/index.ts",
+    // "src/domain/payment/checkout/wallet/api.ts",
+    // "src/domain/payment/checkout/wallet/index.ts",
+    // "src/domain/payment/index.ts",
+    "src/domain/antifraud/fingerprint/index.ts",
+    "src/domain/antifraud/fingerprint/utils.ts",
+    "src/domain/web-constructor.ts",
+    "src/config/env.ts"
+]
 
 // Builda os pacotes separados com esm (para ser usado com 'import')
 esbuild.build({
@@ -105,15 +118,15 @@ esbuild.build({
     define: ENV_OBJ
 }).catch(() => process.exit(1));
 
-esbuild.build({
-    entryPoints: ["src/domain/payment/checkout/index.ts"],
-    bundle: true,
-    minify: false,
-    format: "cjs",
-    outfile: "dist/cjs/domain/payment/checkout/index.cjs",
-    target: ["esnext"],
-    define: ENV_OBJ
-}).catch(() => process.exit(1));
+// esbuild.build({
+//     entryPoints: ["src/domain/payment/checkout/index.ts"],
+//     bundle: true,
+//     minify: false,
+//     format: "cjs",
+//     outfile: "dist/cjs/domain/payment/checkout/index.cjs",
+//     target: ["esnext"],
+//     define: ENV_OBJ
+// }).catch(() => process.exit(1));
 
 esbuild.build({
     entryPoints: ["src/domain/antifraud/fingerprint/index.ts"],

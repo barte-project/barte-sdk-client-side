@@ -15,5 +15,6 @@
     "types": ["@yuno-payments/sdk-web-types/dist/global", "./root.d.ts"],
     "strictPropertyInitialization": false
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/domain/payment/checkout/**/*"]
 }

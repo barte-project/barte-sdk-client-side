@@ -11,7 +11,7 @@ import {
   YunoEnvironmentOptions,
 } from "./types";
 
-export class BarteWallet extends WebConstructor {
+export default class Wallet extends WebConstructor {
   private yuno?: YunoInstance;
 
   constructor({ accessToken, environment }: BarteSDKConstructorProps) {
@@ -258,3 +258,5 @@ export class BarteWallet extends WebConstructor {
     });
   }
 }
+
+export { Wallet };

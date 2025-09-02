@@ -1,5 +1,5 @@
 import { getEnv } from "./config/env";
-import ApiClient from "./domain/payment/checkout/wallet/api";
+// import ApiClient from "./domain/payment/checkout/wallet/api";
 import { EventConfigProps, EventData } from "./types";
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -38,12 +38,12 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  const apiClient = (config: EventConfigProps) => {
-    return new ApiClient({
-      accessToken: config.accessToken,
-      environment: config.environment,
-    });
-  };
+  // const apiClient = (config: EventConfigProps) => {
+  //   return new ApiClient({
+  //     accessToken: config.accessToken,
+  //     environment: config.environment,
+  //   });
+  // };
 
   // TODO: criar um dispatcher do lado do SDK
   window.addEventListener("message", async (ev: MessageEvent<EventData>) => {

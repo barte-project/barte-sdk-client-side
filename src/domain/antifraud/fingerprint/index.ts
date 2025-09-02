@@ -4,7 +4,7 @@ import { AntifraudService } from "../types";
 import type { BarteFingerPrintResult, CreateScriptProps } from "./types";
 import { decodeJwtPayload } from "./utils";
 
-export class BarteFingerprint extends WebConstructor {
+export default class Fingerprint extends WebConstructor {
   private userAgent: string;
   private antifraudService: AntifraudService;
   private attemptReference: string;
@@ -205,3 +205,5 @@ export class BarteFingerprint extends WebConstructor {
     return this.generateAttemptReference();
   }
 }
+
+export { Fingerprint };
