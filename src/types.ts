@@ -5,7 +5,7 @@ export type BarteSDKConstructorProps = {
   environment?: EnvironmentType;
 };
 
-export type BarteErrorProps =  {
+export type BarteErrorProps = {
   errors?: Array<{
     code: string;
     title?: string;
@@ -18,9 +18,28 @@ export type BarteErrorProps =  {
   }>;
   message?: string;
   stack?: string;
-}
+};
 
-export type configHttpProps = {
+export type EventConfigProps = {
   accessToken: string;
   environment: EnvironmentType;
-}
+};
+
+type EventType =
+  | "submitTokenForm"
+  | "submitCreateBuyer"
+  | "submitCreateSession"
+  | "submitCreatePayment";
+
+export type EventData = {
+  type: "submitTokenForm";
+  data: {
+    holderName: string;
+    cvv: string;
+    expiration: string;
+    number: string;
+    buyerUuid: string;
+  };
+} & {
+  config: EventConfigProps;
+};

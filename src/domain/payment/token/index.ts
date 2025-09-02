@@ -1,8 +1,8 @@
-import { createIframe } from "./iframe";
+import { BarteSDKConstructorProps } from "../../../types";
 import { WebConstructor } from "../../web-constructor";
+import { createIframe } from "./iframe";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
-import { BarteSDKConstructorProps } from "../../../types";
 
 export class BarteToken extends WebConstructor {
   constructor({ accessToken, environment }: BarteSDKConstructorProps) {
@@ -64,7 +64,7 @@ export class BarteToken extends WebConstructor {
           config: {
             accessToken: this.accessToken,
             environment: this.environment,
-          }
+          },
         },
         Env.SDK_IFRAME_URL
       );
