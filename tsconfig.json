@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
+    "target": "esnext",
     "module": "ESNext",
     "declaration": true,
     "outDir": "dist",
@@ -10,7 +10,11 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "removeComments": true
+    "removeComments": true,
+    "moduleResolution": "node",
+    "types": ["@yuno-payments/sdk-web-types/dist/global", "./root.d.ts"],
+    "strictPropertyInitialization": false
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/domain/payment/checkout/**/*"]
 }
