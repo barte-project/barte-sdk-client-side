@@ -16,11 +16,9 @@ export type PaymentOrderData = {
   title: string;
   payment: {
     method: string;
-    wallet: {
-      oneTimeToken: string;
-      checkoutSessionUuid: string;
-      integrationOrderId: string;
-    };
+    oneTimeToken: string;
+    checkoutSessionUuid: string;
+    integrationOrderId: string;
     fraudData: {
       internationalDocument: {
         documentNumber: string;
@@ -103,8 +101,6 @@ export type YunoPaymentData = {
   metadata: any;
   uuidBuyer: string;
 };
-
-export type ServiceOptions = "monolict" | "payment";
 
 export interface Amount {
   currency: "BRL" | string;

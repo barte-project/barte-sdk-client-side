@@ -1,7 +1,11 @@
 import { loadScript } from "@yuno-payments/sdk-web";
 import { YunoInstance } from "@yuno-payments/sdk-web-types";
 import { EnvironmentType, getEnv } from "../../../../config/env";
-import { BarteErrorProps, BarteSDKConstructorProps } from "../../../../types";
+import {
+  BarteErrorProps,
+  BarteSDKConstructorProps,
+  CreateSessionResultType,
+} from "../../../../types";
 import { WebConstructor } from "../../../web-constructor";
 import { createIframe } from "../../token/iframe";
 import {
@@ -61,11 +65,9 @@ export default class Wallet extends WebConstructor {
       title: data.paymentDescription || "Wallet Order",
       payment: {
         method: data.method,
-        wallet: {
-          oneTimeToken,
-          checkoutSessionUuid: uuidSession,
-          integrationOrderId: uuidIntegration,
-        },
+        oneTimeToken,
+        checkoutSessionUuid: uuidSession,
+        integrationOrderId: uuidIntegration,
         fraudData: {
           internationalDocument: {
             documentNumber: data.internationalDocument.documentNumber,
@@ -84,45 +86,16 @@ export default class Wallet extends WebConstructor {
             zipCode: data.billingAddress.zipCode,
           },
         },
+        softDescriptor: "soft descriptor",
       },
       metadata: [{ key: "Version", value: "1" }],
       uuidBuyer: data.buyerId,
     };
   }
 
-  private async createBuyer(buyerId: string) {
-    const iframe = await createIframe();
-    return new Promise((resolve, reject) => {
-      const listener = (message: MessageEvent<any>) => {
-        window.removeEventListener("message", listener);
-        if (!this.isBarteDuplicatedCustomerError(message.data)) {
-          reject(
-            new Error(
-              `Error ${message.data.errors[0].code}: ${message.data.errors[0].description} - ${message.data.errors[0].additionalInfo.customMessage}`
-            )
-          );
-        }
-        resolve(message.data);
-      };
-
-      window.addEventListener("message", listener);
-
-      iframe.contentWindow?.postMessage(
-        {
-          type: "submitCreateBuyer",
-          data: {
-            buyerId,
-          },
-          config: {
-            accessToken: this.accessToken,
-            environment: this.environment,
-          },
-        },
-        Env.SDK_IFRAME_URL
-      );
-    });
-  }
-  private async createSession(data: CreateSessionOptions) {
+  private async createSession(
+    data: CreateSessionOptions
+  ): Promise<CreateSessionResultType> {
     const iframe = await createIframe();
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
@@ -196,13 +169,10 @@ export default class Wallet extends WebConstructor {
     const yuno = await this.ensureYunoInitialized(
       getEnv(this.environment).yunoKey
     );
+
     const merchantId = crypto.randomUUID();
-    try {
-      await this.createBuyer(data.buyerId);
-    } catch (err) {
-      throw err;
-    }
-    const sessionData: any = await this.createSession({
+
+    const sessionData = await this.createSession({
       country: data.country ?? "BR",
       amount: {
         currency: data.amount?.currency ?? "BRL",
@@ -215,7 +185,8 @@ export default class Wallet extends WebConstructor {
 
     const uuidSession = sessionData.checkoutSession;
     const uuidIntegration = merchantId;
-    yuno.startCheckout({
+
+    await yuno.startCheckout({
       checkoutSession: uuidSession,
       elementSelector: data.element,
       countryCode: data.country ?? "BR",
@@ -253,7 +224,8 @@ export default class Wallet extends WebConstructor {
         window.location.replace(data.errorURL);
       },
     });
-    yuno.mountCheckoutLite({
+
+    await yuno.mountCheckoutLite({
       paymentMethodType: data.method,
     });
   }

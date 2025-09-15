@@ -26,7 +26,7 @@ const ENV: Record<EnvironmentType, Record<EnvironmentVariables, string>> = {
       "prod_gAAAAABm7ZDEbdCd5AsQHf0I8wm-rAz_pdIzrr7OvuGA298kQHBdCpIUZRW1NPEIzXi_uSC6apXO7dHptkv41heS0jmE94_mfsKi6v6JFQbQAcsnZITRxa1cBO6JhOvuWAj6qIopfgK_MB_5HTbpuhTbRu423YSutvtcrqJumFJeeIRcy89__G7NrJ3Td2fbkEH8rjbblVBxwT4ax14RiuFbvDLGFRAWhbSi23Zw_Wto2D8WhFUTdVwg-T215N10erG5Y0Uq5fRQ",
   },
   local: {
-    monolictUrl: "https://sandbox-bff.barte.com/service/core/",
+    monolictUrl: "http://localhost:8080",
     paymentUrl: "https://sandbox-bff.barte.com/service/payment/",
     apiUrl: "https://sandbox-bff.barte.com/service/payment/v1/sdk/card-tokens",
     yunoKey:
