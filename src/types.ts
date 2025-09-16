@@ -55,14 +55,4 @@ export type EventData = (
 
 export type CreateSessionResultType = {
   checkoutSession: string;
-  country: string;
-  paymentDescription: string;
-  customerId: string;
-  amount: {
-    currency: string;
-    value: number;
-  };
-  createdAt: string;
-  workflow: string;
-  installments: Record<any, any>;
 };
