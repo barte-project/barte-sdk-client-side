@@ -38,11 +38,11 @@ class ApiClient {
   async createSession(
     sessionData: SessionData
   ): Promise<CreateSessionResultType> {
-    return this.request("/v1/sdk/checkout-session", "POST", sessionData);
+    return this.request("v1/sdk/checkout-session", "POST", sessionData);
   }
 
   async createPaymentOrder(paymentOrderData: PaymentOrderData): Promise<any> {
-    return this.request("/v1/sdk/orders", "POST", paymentOrderData);
+    return this.request("v1/sdk/orders", "POST", paymentOrderData);
   }
 }
 

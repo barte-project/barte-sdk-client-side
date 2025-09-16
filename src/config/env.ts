@@ -5,7 +5,7 @@ export type EnvironmentType = (typeof EnvironmentList)[number];
 
 const ENV: Record<EnvironmentType, Record<EnvironmentVariables, string>> = {
   dev: {
-    monolictUrl: "https://dev-bff.barte.com/service/core/",
+    monolictUrl: "https://dev-bff.barte.com/",
     paymentUrl: "https://dev-bff.barte.com/service/payment/",
     apiUrl: "https://dev-bff.barte.com/service/payment/v1/sdk/card-tokens",
     yunoKey:
