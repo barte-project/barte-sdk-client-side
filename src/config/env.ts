@@ -28,11 +28,13 @@ const ENV: Record<EnvironmentType, Record<EnvironmentVariables, string>> = {
   local: {
     monolictUrl: "http://localhost:8080",
     paymentUrl: "https://sandbox-bff.barte.com/service/payment/",
-    apiUrl: "https://sandbox-bff.barte.com/service/payment/v1/sdk/card-tokens",
+    apiUrl: "https://sandbox-bff.barte.com/service/payment/v1/sdk/card-tokens/",
     yunoKey:
       "sandbox_gAAAAABm7ZDFYguOYAtxMqHVOXMyDDP_Wxk-Uq3LgOM6EYTJqeYXXb-oCx47lchu-tRCAZ5i2FNq6SdmHxlLhPUK3FvhRQ3EfKBPhKdjheVOLwUeofvuTl1oma_fiuYskVPIJ1YgtmzhkejIa73XpS7tP0uCl8yDLDF2Sf9zFd5xIYWjLakvRXL3f4Ai1j4_rBYbIOlTXvKucRpJuxAuJsdZQAfNAF5v1ffhogP_Ul8phRQAaL-Pe8eBLXcridZg9gKoGCNV3638",
   },
 };
+
+const formatUrl = (url: string) => (url.endsWith("/") ? url : url.concat("/"));
 
 export const validateEnvironment = (env: EnvironmentType) =>
   EnvironmentList.includes(env);
@@ -42,5 +44,7 @@ export function getEnv(currentEnv: EnvironmentType) {
     throw new Error(
       `O ambiente '${currentEnv}' não é um ambiente válido para o SDK!`
     );
-  return ENV[currentEnv];
+  return Object.fromEntries(
+    Object.entries(ENV[currentEnv]).map(([k, v]) => [k, formatUrl(v)])
+  );
 }
