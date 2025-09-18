@@ -207,7 +207,7 @@ export default class Wallet extends WebConstructor {
           );
           await this.createPaymentOrder(body);
 
-          yuno.continuePayment({
+          await yuno.continuePayment({
             showPaymentStatus: true,
           });
         } catch (err) {
@@ -226,7 +226,7 @@ export default class Wallet extends WebConstructor {
       },
     });
 
-    await yuno.mountCheckoutLite({
+    yuno.mountCheckoutLite({
       paymentMethodType: data.method,
     });
   }
