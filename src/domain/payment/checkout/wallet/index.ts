@@ -99,6 +99,9 @@ export default class Wallet extends WebConstructor {
     const iframe = await createIframe();
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
+        console.log({ origin: message.origin, url: Env.SDK_IFRAME_URL });
+        if (message.origin !== Env.SDK_IFRAME_URL) return;
+
         window.removeEventListener("message", listener);
 
         if (!message.data.error) {
@@ -140,7 +143,11 @@ export default class Wallet extends WebConstructor {
     const iframe = await createIframe();
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
+        console.log({ origin: message.origin, url: Env.SDK_IFRAME_URL });
+        if (message.origin !== Env.SDK_IFRAME_URL) return;
+
         window.removeEventListener("message", listener);
+
         if (!message.data.error) {
           const messageData = message.data;
           // TODO: Mapear outros cenários de erros possíveis aqui
