@@ -225,7 +225,7 @@ export default class Wallet extends WebConstructor {
         window.location.replace(data.errorURL);
       },
     });
-
+    await new Promise(resolve => setTimeout(resolve, 10000))
     yuno.mountCheckoutLite({
       paymentMethodType: data.method,
     });
