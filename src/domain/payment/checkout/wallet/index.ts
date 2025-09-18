@@ -186,7 +186,7 @@ export default class Wallet extends WebConstructor {
     const uuidSession = sessionData.checkoutSession;
     const uuidIntegration = merchantId;
 
-    await yuno.startCheckout({
+    yuno.startCheckout({
       checkoutSession: uuidSession,
       elementSelector: data.element,
       countryCode: data.country ?? "BR",
