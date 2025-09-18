@@ -186,7 +186,7 @@ export default class Wallet extends WebConstructor {
     const uuidSession = sessionData.checkoutSession;
     const uuidIntegration = merchantId;
 
-    yuno.startCheckout({
+    await yuno.startCheckout({
       checkoutSession: uuidSession,
       elementSelector: data.element,
       countryCode: data.country ?? "BR",
@@ -225,8 +225,8 @@ export default class Wallet extends WebConstructor {
         window.location.replace(data.errorURL);
       },
     });
-    await new Promise(resolve => setTimeout(resolve, 10000))
-    yuno.mountCheckoutLite({
+
+    await yuno.mountCheckoutLite({
       paymentMethodType: data.method,
     });
   }
