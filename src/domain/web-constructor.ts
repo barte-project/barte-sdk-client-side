@@ -1,4 +1,4 @@
-import { EnvironmentType, validateEnvironment } from "../config/env";
+import { EnvironmentType, isValidEnvironment } from "../config/env";
 import { BarteSDKConstructorProps } from "../types";
 
 export abstract class WebConstructor {
@@ -13,7 +13,7 @@ export abstract class WebConstructor {
 
     if (!accessToken) throw new Error("Access Token é obrigatório!");
 
-    validateEnvironment(environment ?? "production");
+    isValidEnvironment(environment ?? "production");
 
     this.accessToken = accessToken;
     this.environment = environment ?? "production";

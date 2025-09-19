@@ -1,6 +1,7 @@
 import { BarteSDKConstructorProps } from "../../../types";
+import { dispatchScriptMessage } from "../../message/dispatchMessage";
+import { areOriginsTheSame } from "../../message/utils";
 import { WebConstructor } from "../../web-constructor";
-import { createIframe } from "./iframe";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
 
@@ -31,10 +32,25 @@ export class CardToken extends WebConstructor {
     if (/\D/g.test(cardCVV) || cardCVV.length > 4 || cardCVV.length < 3)
       throw new Error("Formato de CVV inválido");
 
-    const iframe = await createIframe();
+    await dispatchScriptMessage({
+      type: "submitTokenForm",
+      data: {
+        holderName: cardHolderName.trim(),
+        cvv: cardCVV,
+        expiration: cardExpiryDate,
+        number: cardNumber,
+        buyerUuid,
+      },
+      config: {
+        accessToken: this.accessToken,
+        environment: this.environment,
+      },
+    });
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
+        if (!areOriginsTheSame(message.origin)) return;
+
         window.removeEventListener("message", listener);
 
         if (!message.data.error) {
@@ -50,24 +66,6 @@ export class CardToken extends WebConstructor {
       };
 
       window.addEventListener("message", listener);
-
-      iframe.contentWindow?.postMessage(
-        {
-          type: "submitTokenForm",
-          data: {
-            holderName: cardHolderName.trim(),
-            cvv: cardCVV,
-            expiration: cardExpiryDate,
-            number: cardNumber,
-            buyerUuid,
-          },
-          config: {
-            accessToken: this.accessToken,
-            environment: this.environment,
-          },
-        },
-        Env.SDK_IFRAME_URL
-      );
     });
   }
 }
