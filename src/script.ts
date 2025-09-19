@@ -61,8 +61,11 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     if (eventData.type === "submitCreatePayment") {
-      const result = await api.createPaymentOrder(eventData.data);
-      window.parent.postMessage(result, "*");
+      await api.createPaymentOrder(eventData.data);
+      window.parent.postMessage(
+        { error: false, message: "Order Criada com sucesso!" },
+        "*"
+      );
     }
   });
 });

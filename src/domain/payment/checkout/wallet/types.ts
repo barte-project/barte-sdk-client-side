@@ -113,12 +113,14 @@ export interface PaymentOptions {
   buyerId: string;
   amount: Amount;
   method: "GOOGLE_PAY" | "APPLE_PAY";
-  paymentDescription?: string;
+  title: string;
+  description: string;
+  softDescriptor?: string;
   //Payment Order Props
   startDate: string; // Ex: yyyy-MM-dd
   internationalDocument: {
     documentNumber: string;
-    documentType: string; // Ex: CPF
+    documentType: "CPF" | "CNPJ"; // Ex: CPF
     documentNation: string; // Ex: BR
   };
   name: string;

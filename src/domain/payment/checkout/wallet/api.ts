@@ -26,19 +26,35 @@ class ApiClient {
       "Content-Type": "application/json",
       "X-Token-Sdk": this.accessToken,
     };
+
     const options = {
       method,
       headers,
       body: body ? JSON.stringify(body) : null,
     };
+
     const response = await fetch(`${this.monolictUrl}${endpoint}`, options);
-    return await response.json();
+
+    let data = null;
+
+    const contentLength = response.headers.get("content-length");
+    const contentType = response.headers.get("content-type");
+
+    if (contentLength !== "0" && contentType?.includes("application/json")) {
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+    }
+
+    return data;
   }
 
   async createSession(
     sessionData: SessionData
   ): Promise<CreateSessionResultType> {
-    return this.request("v1/sdk/checkout-session", "POST", sessionData);
+    return this.request("v1/sdk/wallet/session", "POST", sessionData);
   }
 
   async createPaymentOrder(paymentOrderData: PaymentOrderData): Promise<any> {

@@ -35,7 +35,7 @@ export class CardToken extends WebConstructor {
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
-        if (message.origin !== Env.SDK_IFRAME_URL) return;
+        // if (message.origin !== Env.SDK_IFRAME_URL) return;
 
         window.removeEventListener("message", listener);
 

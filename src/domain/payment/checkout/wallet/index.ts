@@ -2,7 +2,6 @@ import { loadScript } from "@yuno-payments/sdk-web";
 import { YunoInstance } from "@yuno-payments/sdk-web-types";
 import { EnvironmentType, getEnv } from "../../../../config/env";
 import {
-  BarteErrorProps,
   BarteSDKConstructorProps,
   CreateSessionResultType,
 } from "../../../../types";
@@ -37,10 +36,6 @@ export default class Wallet extends WebConstructor {
     return Number(String(v).replace(/\./g, "").replace(",", "."));
   }
 
-  private isBarteDuplicatedCustomerError(response: BarteErrorProps): boolean {
-    return response?.errors?.[0]?.code === "BAR-1801";
-  }
-
   private async ensureYunoInitialized(
     publicKey: string
   ): Promise<YunoInstance> {
@@ -62,7 +57,8 @@ export default class Wallet extends WebConstructor {
       startDate: data.startDate,
       value: this.parseAmountValue(data.amount.value),
       installments: 1,
-      title: data.paymentDescription || "Wallet Order",
+      title: data.title || "Wallet Order",
+      description: data.description,
       payment: {
         method: data.method,
         oneTimeToken,
@@ -86,7 +82,7 @@ export default class Wallet extends WebConstructor {
             zipCode: data.billingAddress.zipCode,
           },
         },
-        softDescriptor: "soft descriptor",
+        softDescriptor: data.softDescriptor,
       },
       metadata: [{ key: "Version", value: "1" }],
       uuidBuyer: data.buyerId,
@@ -99,7 +95,7 @@ export default class Wallet extends WebConstructor {
     const iframe = await createIframe();
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
-        if (message.origin !== Env.SDK_IFRAME_URL) return;
+        // if (message.origin !== Env.SDK_IFRAME_URL) return;
 
         window.removeEventListener("message", listener);
 
@@ -142,7 +138,7 @@ export default class Wallet extends WebConstructor {
     const iframe = await createIframe();
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
-        if (message.origin !== Env.SDK_IFRAME_URL) return;
+        // if (message.origin !== Env.SDK_IFRAME_URL) return;
 
         window.removeEventListener("message", listener);
 
@@ -185,7 +181,7 @@ export default class Wallet extends WebConstructor {
       },
       uuidBuyer: data.buyerId,
       merchantOrderId: merchantId,
-      paymentDescription: data.paymentDescription || "",
+      paymentDescription: data.title,
     });
 
     const uuidSession = sessionData.checkoutSession;
