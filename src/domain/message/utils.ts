@@ -10,5 +10,10 @@ export const areOriginsTheSame = (originMessage: string) =>
 const isEventValid = (eventName: EventType) =>
   EventTypeData.includes(eventName);
 
-export const validateOriginAndEventName = (message: MessageEvent) =>
-  areOriginsTheSame(message.origin) && isEventValid(message.data?.eventName);
+export const validateOriginAndEventName = (
+  message: MessageEvent,
+  eventType: EventType
+) =>
+  areOriginsTheSame(message.origin) &&
+  isEventValid(message.data?.type) &&
+  eventType === message.data?.type;

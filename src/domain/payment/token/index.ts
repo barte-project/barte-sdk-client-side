@@ -1,6 +1,6 @@
 import { BarteSDKConstructorProps } from "../../../types";
 import { dispatchScriptMessage } from "../../message/dispatchMessage";
-import { areOriginsTheSame } from "../../message/utils";
+import { validateOriginAndEventName } from "../../message/utils";
 import { WebConstructor } from "../../web-constructor";
 import type { CardTokenData, TokenizeResult } from "./types";
 import { dateValidator, luhnValidator } from "./utils";
@@ -49,7 +49,7 @@ export class CardToken extends WebConstructor {
 
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
-        if (!areOriginsTheSame(message.origin)) return;
+        if (!validateOriginAndEventName(message, "submitTokenForm")) return;
 
         window.removeEventListener("message", listener);
 

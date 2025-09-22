@@ -22,17 +22,20 @@ window.addEventListener("DOMContentLoaded", () => {
 
       if (result.errors && Array.isArray(result.errors) && result.errors.length)
         return {
+          type: "submitTokenForm",
           error: true,
           errorMessage: "Erro ao tokenizar cartão!",
           errorDetails: result.errors,
         };
 
       return {
+        type: "submitTokenForm",
         error: false,
         data: result,
       };
     } catch (error) {
       return {
+        type: "submitTokenForm",
         error: true,
         errorMessage: error,
       };
