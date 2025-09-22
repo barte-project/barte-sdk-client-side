@@ -13,7 +13,16 @@ const isEventValid = (eventName: EventType) =>
 export const validateOriginAndEventName = (
   message: MessageEvent,
   eventType: EventType
-) =>
-  areOriginsTheSame(message.origin) &&
-  isEventValid(message.data?.type) &&
-  eventType === message.data?.type;
+) => {
+  console.log({
+    originMessage: message.origin,
+    iframeURL: Env.SDK_IFRAME_URL,
+    eventType,
+    eventMessage: message.data?.type,
+  });
+  return (
+    areOriginsTheSame(message.origin) &&
+    isEventValid(message.data?.type) &&
+    eventType === message.data?.type
+  );
+};

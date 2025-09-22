@@ -18,19 +18,19 @@ const ENVIRONMENT_URLS = {
     },
     dev: {
         SDK_SCRIPT_URL: "\"https://dev-sdk-client.barte.com/script.min.js\"",
-        SDK_IFRAME_URL: "\"https://dev-sdk-client.barte.com/\""
+        SDK_IFRAME_URL: "\"https://dev-sdk-client.barte.com\""
     },
     sandbox: {
         SDK_SCRIPT_URL: "\"https://sandbox-sdk-client.barte.com/script.min.js\"",
-        SDK_IFRAME_URL: "\"https://sandbox-sdk-client.barte.com/\""
+        SDK_IFRAME_URL: "\"https://sandbox-sdk-client.barte.com\""
     },
     hml: {
         SDK_SCRIPT_URL: "\"https://hml-sdk-client.barte.com/script.min.js\"",
-        SDK_IFRAME_URL: "\"https://hml-sdk-client.barte.com/\""
+        SDK_IFRAME_URL: "\"https://hml-sdk-client.barte.com\""
     },
     production: {
         SDK_SCRIPT_URL: "\"https://sdk-client.barte.com/script.min.js\"",
-        SDK_IFRAME_URL: "\"https://sdk-client.barte.com/\""
+        SDK_IFRAME_URL: "\"https://sdk-client.barte.com\""
     }
 }
 
