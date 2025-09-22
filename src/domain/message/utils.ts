@@ -12,7 +12,7 @@ export const areOriginsTheSame = (originMessage: string) => {
   return isLocalHost() ? true : originMessage === Env.SDK_IFRAME_URL;
 };
 
-const isEventValid = (eventName: EventType) =>
+export const isEventValid = (eventName: EventType) =>
   EventTypeData.includes(eventName);
 
 export const validateOriginAndEventName = (

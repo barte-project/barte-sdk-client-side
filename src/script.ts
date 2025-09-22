@@ -1,7 +1,7 @@
 import { getEnv } from "./config/env";
-import { areOriginsTheSame } from "./domain/message/utils";
+import { isEventValid } from "./domain/message/utils";
 // import ApiClient from "./domain/payment/checkout/wallet/api";
-import { EventConfigProps, EventDataRequest } from "./domain/message/types";
+import { EventDataRequest } from "./domain/message/types";
 
 window.addEventListener("DOMContentLoaded", () => {
   async function httpRequestToken(data: EventDataRequest) {
@@ -55,7 +55,7 @@ window.addEventListener("DOMContentLoaded", () => {
     async (ev: MessageEvent<EventDataRequest>) => {
       const eventData = ev.data;
       // const api = apiClient(eventData.config);
-      if (!areOriginsTheSame(ev.origin)) return;
+      if (!isEventValid(ev.data?.type)) return;
 
       if (eventData.type === "submitTokenForm") {
         const result = await httpRequestToken(eventData);
