@@ -201,6 +201,7 @@ export default class Wallet extends WebConstructor {
       card: { type: "extends", cardSaveEnable: true },
       onLoading: (args) => console.log(args),
       yunoCreatePayment: async (oneTimeToken) => {
+        await new Promise(resolve => setTimeout(resolve, 1000))
         try {
           const body = this.buildPaymentPayload(
             data,
@@ -210,10 +211,9 @@ export default class Wallet extends WebConstructor {
             sessionData.integrationCustomerId
           );
           await this.createPaymentOrder(body);
-          // await new Promise(resolve => setTimeout(resolve, 20000))
-          // await yuno.continuePayment({
-          //   showPaymentStatus: true,
-          // });
+          await yuno.continuePayment({
+            showPaymentStatus: true,
+          });
         } catch (err) {
           console.error("Erro ao criar pagamento:", err);
           yuno.hideLoader();
