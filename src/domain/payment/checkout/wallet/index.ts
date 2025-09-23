@@ -51,7 +51,8 @@ export default class Wallet extends WebConstructor {
     data: PaymentOptions,
     oneTimeToken: string,
     uuidSession: string,
-    uuidIntegration: string
+    uuidIntegration: string,
+    integrationCustomerId: string
   ) {
     return {
       startDate: data.startDate,
@@ -86,6 +87,7 @@ export default class Wallet extends WebConstructor {
       },
       metadata: [{ key: "Version", value: "1" }],
       uuidBuyer: data.buyerId,
+      integrationCustomerId,
     };
   }
 
@@ -204,7 +206,8 @@ export default class Wallet extends WebConstructor {
             data,
             oneTimeToken,
             uuidSession,
-            uuidIntegration
+            uuidIntegration,
+            sessionData.integrationCustomerId
           );
           await this.createPaymentOrder(body);
 

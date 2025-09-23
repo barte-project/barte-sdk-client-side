@@ -40,4 +40,5 @@ export type EventData = (
 
 export type CreateSessionResultType = {
   checkoutSession: string;
+  integrationCustomerId: string;
 };
