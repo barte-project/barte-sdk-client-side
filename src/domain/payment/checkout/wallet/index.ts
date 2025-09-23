@@ -175,8 +175,6 @@ export default class Wallet extends WebConstructor {
 
     const merchantId = crypto.randomUUID();
 
-    debugger;
-
     const sessionData = await this.createSession({
       country: data.country ?? "BR",
       amount: {
