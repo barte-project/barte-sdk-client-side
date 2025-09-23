@@ -209,23 +209,23 @@ export default class Wallet extends WebConstructor {
             uuidIntegration,
             sessionData.integrationCustomerId
           );
-          await this.createPaymentOrder(body);
-
-          await yuno.continuePayment({
-            showPaymentStatus: true,
+          await this.createPaymentOrder(body).then(async () => {
+            await yuno.continuePayment({
+              showPaymentStatus: true,
+            });
           });
         } catch (err) {
           console.error("Erro ao criar pagamento:", err);
           yuno.hideLoader();
-        }
+        } 
       },
       yunoPaymentResult: async (result: unknown) => {
         console.log("yunoPaymentResult", result);
         window.location.replace(data.successURL);
       },
-      yunoError: (error) => {
+      yunoError: async (error) => {
         console.error("Erro no Yuno:", error);
-        yuno.hideLoader();
+        await yuno.hideLoader();
         window.location.replace(data.errorURL);
       },
     });
