@@ -78,6 +78,6 @@
     }
   },
   "dependencies": {
-    "@yuno-payments/sdk-web": "2.0.0"
+    "@yuno-payments/sdk-web": "2.1.0"
   }
 }
