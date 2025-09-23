@@ -112,6 +112,7 @@ export interface PaymentOptions {
   language?: "pt" | "en" | "es";
   buyerId: string;
   amount: Amount;
+  installments: number;
   method: "GOOGLE_PAY" | "APPLE_PAY";
   title: string;
   description: string;

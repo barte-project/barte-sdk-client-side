@@ -56,7 +56,7 @@ export default class Wallet extends WebConstructor {
     return {
       startDate: data.startDate,
       value: this.parseAmountValue(data.amount.value),
-      installments: 1,
+      installments: data.installments,
       title: data.title || "Wallet Order",
       description: data.description,
       payment: {
