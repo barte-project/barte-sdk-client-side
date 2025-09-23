@@ -210,7 +210,7 @@ export default class Wallet extends WebConstructor {
             sessionData.integrationCustomerId
           );
           await this.createPaymentOrder(body);
-          await new Promise(resolve => setTimeout(resolve, 20000))
+          // await new Promise(resolve => setTimeout(resolve, 20000))
           await yuno.continuePayment({
             showPaymentStatus: true,
           });
