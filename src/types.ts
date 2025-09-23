@@ -19,27 +19,3 @@ export type BarteErrorProps = {
   message?: string;
   stack?: string;
 };
-
-export type EventConfigProps = {
-  accessToken: string;
-  environment: EnvironmentType;
-};
-
-type EventType =
-  | "submitTokenForm"
-  | "submitCreateBuyer"
-  | "submitCreateSession"
-  | "submitCreatePayment";
-
-export type EventData = {
-  type: "submitTokenForm";
-  data: {
-    holderName: string;
-    cvv: string;
-    expiration: string;
-    number: string;
-    buyerUuid: string;
-  };
-} & {
-  config: EventConfigProps;
-};

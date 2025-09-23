@@ -1,9 +1,10 @@
 import { getEnv } from "./config/env";
+import { isEventValid } from "./domain/message/utils";
 // import ApiClient from "./domain/payment/checkout/wallet/api";
-import { EventConfigProps, EventData } from "./types";
+import { EventDataRequest } from "./domain/message/types";
 
 window.addEventListener("DOMContentLoaded", () => {
-  async function httpRequestToken(data: EventData) {
+  async function httpRequestToken(data: EventDataRequest) {
     try {
       const requestResult = await fetch(
         getEnv(data.config.environment).apiUrl,
@@ -21,17 +22,20 @@ window.addEventListener("DOMContentLoaded", () => {
 
       if (result.errors && Array.isArray(result.errors) && result.errors.length)
         return {
+          type: "submitTokenForm",
           error: true,
           errorMessage: "Erro ao tokenizar cartão!",
           errorDetails: result.errors,
         };
 
       return {
+        type: "submitTokenForm",
         error: false,
         data: result,
       };
     } catch (error) {
       return {
+        type: "submitTokenForm",
         error: true,
         errorMessage: error,
       };
@@ -46,29 +50,33 @@ window.addEventListener("DOMContentLoaded", () => {
   // };
 
   // TODO: criar um dispatcher do lado do SDK
-  window.addEventListener("message", async (ev: MessageEvent<EventData>) => {
-    const eventData = ev.data;
-    // const api = apiClient(eventData.config);
+  window.addEventListener(
+    "message",
+    async (ev: MessageEvent<EventDataRequest>) => {
+      const eventData = ev.data;
+      // const api = apiClient(eventData.config);
+      if (!isEventValid(ev.data?.type)) return;
 
-    if (eventData.type === "submitTokenForm") {
-      const result = await httpRequestToken(eventData);
-      window.parent.postMessage(result, "*");
+      if (eventData.type === "submitTokenForm") {
+        const result = await httpRequestToken(eventData);
+        window.parent.postMessage(result, "*");
+      }
+
+      // if (eventData.type === "submitCreateBuyer") {
+      //   const result = await api.createBuyerYuno(eventData.data.buyerId);
+      //   window.parent.postMessage(result, "*");
+      // }
+
+      // if (eventData.type === "submitCreateSession") {
+      //   console.log(eventData.data);
+      //   const result = await api.createSession(eventData.data);
+      //   window.parent.postMessage(result, "*");
+      // }
+
+      // if (eventData.type === "submitCreatePayment") {
+      //   const result = await api.createPaymentOrder(eventData.data);
+      //   window.parent.postMessage(result, "*");
+      // }
     }
-
-    // if (eventData.type === "submitCreateBuyer") {
-    //   const result = await api.createBuyerYuno(eventData.data.buyerId);
-    //   window.parent.postMessage(result, "*");
-    // }
-
-    // if (eventData.type === "submitCreateSession") {
-    //   console.log(eventData.data);
-    //   const result = await api.createSession(eventData.data);
-    //   window.parent.postMessage(result, "*");
-    // }
-
-    // if (eventData.type === "submitCreatePayment") {
-    //   const result = await api.createPaymentOrder(eventData.data);
-    //   window.parent.postMessage(result, "*");
-    // }
-  });
+  );
 });
