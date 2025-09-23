@@ -211,9 +211,9 @@ export default class Wallet extends WebConstructor {
           );
           await this.createPaymentOrder(body);
           // await new Promise(resolve => setTimeout(resolve, 20000))
-          await yuno.continuePayment({
-            showPaymentStatus: true,
-          });
+          // await yuno.continuePayment({
+          //   showPaymentStatus: true,
+          // });
         } catch (err) {
           console.error("Erro ao criar pagamento:", err);
           yuno.hideLoader();
