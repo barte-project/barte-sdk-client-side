@@ -175,6 +175,8 @@ export default class Wallet extends WebConstructor {
 
     const merchantId = crypto.randomUUID();
 
+    debugger;
+
     const sessionData = await this.createSession({
       country: data.country ?? "BR",
       amount: {
@@ -223,9 +225,9 @@ export default class Wallet extends WebConstructor {
         console.log("yunoPaymentResult", result);
         window.location.replace(data.successURL);
       },
-      yunoError: (error) => {
+      yunoError: async (error) => {
         console.error("Erro no Yuno:", error);
-        yuno.hideLoader();
+        await yuno.hideLoader();
         window.location.replace(data.errorURL);
       },
     });
