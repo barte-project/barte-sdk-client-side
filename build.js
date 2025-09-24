@@ -29,8 +29,8 @@ const ENVIRONMENT_URLS = {
         SDK_IFRAME_URL: "https://hml-sdk-client.barte.com"
     },
     production: {
-        SDK_SCRIPT_URL: "https://dev-sdk-client.barte.com/script.min.js",
-        SDK_IFRAME_URL: "https://dev-sdk-client.barte.com"
+        SDK_SCRIPT_URL: "https://sdk-client.barte.com/script.min.js",
+        SDK_IFRAME_URL: "https://sdk-client.barte.com"
     }
 }
 

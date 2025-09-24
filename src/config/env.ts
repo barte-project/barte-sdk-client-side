@@ -52,7 +52,8 @@ export function getEnv(currentEnv: EnvironmentType) {
     throw new Error(
       `O ambiente '${currentEnv}' não é um ambiente válido para o SDK!`
     );
-  return Object.fromEntries(
-    Object.entries(ENV[currentEnv]).map(([k, v]) => [k, formatUrl(v)])
-  );
+  // return Object.fromEntries(
+  //   Object.entries(ENV[currentEnv]).map(([k, v]) => [k, formatUrl(v)])
+  // );
+  return ENV[currentEnv];
 }

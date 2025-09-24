@@ -13,6 +13,7 @@ import {
   PaymentOrderData,
   YunoEnvironmentOptions,
 } from "./types";
+import { validateOriginAndEventName } from "../../../message/utils";
 
 export default class Wallet extends WebConstructor {
   private yuno?: YunoInstance;
@@ -93,21 +94,24 @@ export default class Wallet extends WebConstructor {
 
   private async createSession(
     data: CreateSessionOptions
-  ): Promise<CreateSessionResultType> {
+  ): Promise<{ data: CreateSessionResultType }> {
     const iframe = await createIframe();
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
-        // if (message.origin !== Env.SDK_IFRAME_URL) return;
+        if (!validateOriginAndEventName(message, "submitCreateSession")) return;
 
         window.removeEventListener("message", listener);
 
         if (!message.data.error) {
           const messageData = message.data;
-          // TODO: Mapear outros cenários de erros possíveis aqui
-          if (Array.isArray(messageData.errors) && messageData.errors.length)
+
+          if (Array.isArray(messageData.errors) && messageData.errors.length) {
             reject(messageData);
+            return;
+          }
 
           resolve(messageData);
+          return;
         }
         reject(message.data);
       };
@@ -140,13 +144,13 @@ export default class Wallet extends WebConstructor {
     const iframe = await createIframe();
     return new Promise((resolve, reject) => {
       const listener = (message: MessageEvent<any>) => {
-        // if (message.origin !== Env.SDK_IFRAME_URL) return;
+        if (!validateOriginAndEventName(message, "submitCreatePayment")) return;
 
         window.removeEventListener("message", listener);
 
         if (!message.data.error) {
           const messageData = message.data;
-          // TODO: Mapear outros cenários de erros possíveis aqui
+
           if (Array.isArray(messageData.errors) && messageData.errors.length)
             reject(messageData);
           resolve(messageData);
@@ -186,7 +190,7 @@ export default class Wallet extends WebConstructor {
       paymentDescription: data.title,
     });
 
-    const uuidSession = sessionData.checkoutSession;
+    const uuidSession = sessionData.data.checkoutSession;
     const uuidIntegration = merchantId;
 
     await yuno.startCheckout({
@@ -201,14 +205,14 @@ export default class Wallet extends WebConstructor {
       card: { type: "extends", cardSaveEnable: true },
       onLoading: (args) => console.log(args),
       yunoCreatePayment: async (oneTimeToken) => {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         try {
           const body = this.buildPaymentPayload(
             data,
             oneTimeToken,
             uuidSession,
             uuidIntegration,
-            sessionData.integrationCustomerId
+            sessionData.data.integrationCustomerId
           );
           await this.createPaymentOrder(body);
           await yuno.continuePayment({
@@ -217,7 +221,7 @@ export default class Wallet extends WebConstructor {
         } catch (err) {
           console.error("Erro ao criar pagamento:", err);
           yuno.hideLoader();
-        } 
+        }
       },
       yunoPaymentResult: async (result: unknown) => {
         console.log("yunoPaymentResult", result);
