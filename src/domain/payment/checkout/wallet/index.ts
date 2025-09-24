@@ -203,9 +203,9 @@ export default class Wallet extends WebConstructor {
       issuersFormEnable: true,
       renderMode: { type: "element", elementSelector: data.element },
       card: { type: "extends", cardSaveEnable: true },
-      onLoading: (args) => console.log(args),
+      onLoading: (args) => (args.isLoading),
       yunoCreatePayment: async (oneTimeToken) => {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // await new Promise((resolve) => setTimeout(resolve, 2000));
         try {
           const body = this.buildPaymentPayload(
             data,
