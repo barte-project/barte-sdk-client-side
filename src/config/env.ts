@@ -36,11 +36,19 @@ const ENV: Record<EnvironmentType, Record<EnvironmentVariables, string>> = {
 
 const formatUrl = (url: string) => (url.endsWith("/") ? url : url.concat("/"));
 
-export const validateEnvironment = (env: EnvironmentType) =>
+export const isValidEnvironment = (env: EnvironmentType) =>
   EnvironmentList.includes(env);
 
+const getInvalidEnvironmentError = (currentEnv: EnvironmentType) =>
+  new Error(`O ambiente '${currentEnv}' não é um ambiente válido para o SDK!`);
+
+export const validateEnvironment = (currentEnv: EnvironmentType) => {
+  if (!isValidEnvironment(currentEnv))
+    throw getInvalidEnvironmentError(currentEnv);
+};
+
 export function getEnv(currentEnv: EnvironmentType) {
-  if (!validateEnvironment(currentEnv))
+  if (!isValidEnvironment(currentEnv))
     throw new Error(
       `O ambiente '${currentEnv}' não é um ambiente válido para o SDK!`
     );

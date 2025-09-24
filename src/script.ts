@@ -1,9 +1,16 @@
 import { getEnv } from "./config/env";
 import ApiClient from "./domain/payment/checkout/wallet/api";
-import { EventConfigProps, EventData } from "./types";
+import { EventDataRequest, EventConfigProps } from "./domain/message/types";
+import { isEventValid } from "./domain/message/utils";
+import {
+  DispatchResultType,
+  dispatchScriptResultMessage,
+} from "./domain/message/dispatchMessage";
 
 window.addEventListener("DOMContentLoaded", () => {
-  async function httpRequestToken(data: EventData) {
+  async function httpRequestToken(
+    data: EventDataRequest
+  ): Promise<DispatchResultType> {
     try {
       const requestResult = await fetch(
         getEnv(data.config.environment).apiUrl,
@@ -21,17 +28,20 @@ window.addEventListener("DOMContentLoaded", () => {
 
       if (result.errors && Array.isArray(result.errors) && result.errors.length)
         return {
+          type: "submitTokenForm",
           error: true,
           errorMessage: "Erro ao tokenizar cartão!",
           errorDetails: result.errors,
         };
 
       return {
+        type: "submitTokenForm",
         error: false,
         data: result,
       };
     } catch (error) {
       return {
+        type: "submitTokenForm",
         error: true,
         errorMessage: error,
       };
@@ -45,27 +55,39 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // TODO: criar um dispatcher do lado do SDK
-  window.addEventListener("message", async (ev: MessageEvent<EventData>) => {
-    const eventData = ev.data;
-    const api = apiClient(eventData.config);
+  window.addEventListener(
+    "message",
+    async (ev: MessageEvent<EventDataRequest>) => {
+      const eventData = ev.data;
+      const api = apiClient(eventData.config);
 
-    if (eventData.type === "submitTokenForm") {
-      const result = await httpRequestToken(eventData);
-      window.parent.postMessage(result, "*");
-    }
+      if (!isEventValid(ev.data?.type)) return;
 
-    if (eventData.type === "submitCreateSession") {
-      const result = await api.createSession(eventData.data);
-      window.parent.postMessage(result, "*");
-    }
+      if (eventData.type === "submitTokenForm") {
+        const result = await httpRequestToken(eventData);
 
-    if (eventData.type === "submitCreatePayment") {
-      await api.createPaymentOrder(eventData.data);
-      window.parent.postMessage(
-        { error: false, message: "Order Criada com sucesso!" },
-        "*"
-      );
+        dispatchScriptResultMessage(result);
+      }
+
+      if (eventData.type === "submitCreateSession") {
+        const result = await api.createSession(eventData.data);
+
+        dispatchScriptResultMessage({
+          type: "submitCreateSession",
+          error: false,
+          data: result,
+        });
+      }
+
+      if (eventData.type === "submitCreatePayment") {
+        await api.createPaymentOrder(eventData.data);
+
+        dispatchScriptResultMessage({
+          type: "submitCreatePayment",
+          error: false,
+          data: "Order Criada com sucesso!",
+        });
+      }
     }
-  });
+  );
 });
