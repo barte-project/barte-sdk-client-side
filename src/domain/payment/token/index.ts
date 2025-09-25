@@ -56,11 +56,13 @@ export class CardToken extends WebConstructor {
         if (!message.data.error) {
           const messageData = message.data;
 
-          // TODO: Mapear outros cenários de erros possíveis aqui
-          if (Array.isArray(messageData.errors) && messageData.errors.length)
+          if (Array.isArray(messageData.errors) && messageData.errors.length) {
             reject(messageData);
+            return;
+          }
 
           resolve(messageData);
+          return;
         }
         reject(message.data);
       };

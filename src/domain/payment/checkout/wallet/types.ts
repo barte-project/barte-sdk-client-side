@@ -16,11 +16,9 @@ export type PaymentOrderData = {
   title: string;
   payment: {
     method: string;
-    wallet: {
-      oneTimeToken: string;
-      checkoutSessionUuid: string;
-      integrationOrderId: string;
-    };
+    oneTimeToken: string;
+    checkoutSessionUuid: string;
+    integrationOrderId: string;
     fraudData: {
       internationalDocument: {
         documentNumber: string;
@@ -104,8 +102,6 @@ export type YunoPaymentData = {
   uuidBuyer: string;
 };
 
-export type ServiceOptions = "monolict" | "payment";
-
 export interface Amount {
   currency: "BRL" | string;
   value: number;
@@ -116,13 +112,16 @@ export interface PaymentOptions {
   language?: "pt" | "en" | "es";
   buyerId: string;
   amount: Amount;
+  installments: number;
   method: "GOOGLE_PAY" | "APPLE_PAY";
-  paymentDescription?: string;
+  title: string;
+  description: string;
+  softDescriptor?: string;
   //Payment Order Props
   startDate: string; // Ex: yyyy-MM-dd
   internationalDocument: {
     documentNumber: string;
-    documentType: string; // Ex: CPF
+    documentType: "CPF" | "CNPJ"; // Ex: CPF
     documentNation: string; // Ex: BR
   };
   name: string;

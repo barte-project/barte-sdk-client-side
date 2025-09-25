@@ -14,16 +14,22 @@ export const EventTypeData = [
 
 export type EventType = (typeof EventTypeData)[number];
 
-export type EventDataRequest = {
-  type: "submitTokenForm";
-  data: {
-    holderName: string;
-    cvv: string;
-    expiration: string;
-    number: string;
-    buyerUuid: string;
-  };
-} & {
+export type EventDataRequest = (
+  | {
+      type: "submitTokenForm";
+      data: {
+        holderName: string;
+        cvv: string;
+        expiration: string;
+        number: string;
+        buyerUuid: string;
+      };
+    }
+  | {
+      type: EventType;
+      data: any;
+    }
+) & {
   config: EventConfigProps;
 };
 

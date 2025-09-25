@@ -1,1 +1,1 @@
-// export * from "./wallet/index";
+export * from "./wallet/index";
